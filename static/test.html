@@ -3,10 +3,21 @@
     <body>
         <input type="file" id="image-upload" name="image" accept="image/*" capture>
         <button onclick="requestLocation()">Get Location</button>
+        <button onclick="vibrate()">Buzz</button>
     </body>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
     <script>
         const fileInput = document.getElementById("image-upload");
         
+        function vibrate() {
+          if (navigator.vibrate) {
+            navigator.vibrate([500, 300, 100]);
+          }
+          EXIF.getData(fileInput.files[0], function () {
+              console.log(EXIF.getAllTags(this));
+            })
+        }
+
         fileInput.onchange = () => {
             const selectedFile = fileInput.files[0];
             console.log(selectedFile);
@@ -21,6 +32,8 @@
             console.log(fileInput.files[0]);
 
             const file = fileInput.files[0];
+
+            
 
             let location = {
                 "latitude": loc.coords.latitude,
@@ -37,35 +50,6 @@
                 body: fd
             })
         }
-        function getUserPosition() {
-            const promiseArray = [];
-          
-            if (navigator.standalone) {
-              promiseArray.push(
-                new Promise((resolve, reject) => {
-                  const wait = setTimeout(() => {
-                    clearTimeout(wait);
-                    reject('Location has timed out');
-                  }, 4000);
-                })
-              );
-            }
-          
-            const getCurrentPositionPromise = new Promise((resolve, reject) => {
-              if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(resolve, reject, {
-                  timeout: 5000,
-                  maximumAge: 2000,
-                  enableHighAccuracy: true,
-                });
-              } else {
-                reject(new Error('Browser does not support geolocation!'));
-              }
-            });
-          
-            promiseArray.push(getCurrentPositionPromise);
-          
-            return Promise.race(promiseArray);
-          }
+
     </script>
 </html>
