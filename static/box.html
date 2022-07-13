@@ -1,102 +1,75 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.14.1/css/ol.css" type="text/css">
-    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.14.1/build/ol.js"></script>
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>boxquest</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+
 </head>
 
 <style>
-    html, body {
-        max-width: 100%;
-        overflow-x: hidden;
+    .logo {
+        font-family: "Open Sans";
+        font-weight: 700;
     }
 </style>
 
-<body style="background-color: #cd9f61;">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<body>
+    <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"
-                style="font-family: Open Sans; font-weight: 700;">boxquest</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
+            <a class="navbar-brand logo">boxquest</a>
         </div>
     </nav>
-    <div class="card" style="background-color: white;">
-        <div class="card-body">
-            <img class="card-img-top mb-3" id="output">
-            <input type="file" id="image-upload" name="image" accept="image/*" onchange="loadFile(event);" style="display: none;" capture>
-            <div class="d-grid gap-2">
-                <button class="btn btn-primary btn-lg mb-3" onclick="triggerUpload();">Custom Upload</button>
+    <div class="container p-3">
+        <div class="d-grid gap-3">
+            <div class="card" style="background-color: grey;">
+                <input type="image" src="placeholder.svg" class="rounded-2" id="image-display"
+                    onclick="triggerUpload()">
             </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="basic-addon1">@</span>
-                <input type="text" id="coordinate-display" class="form-control form-control-lg" readonly>
-              </div>
-              
-            <button class="btn btn-primary btn-lg mb-3" style="width: 100%; height: 50px;" onclick="requestLocation();">Get Location</button>
-            
-            <div class="mb-3">
-                <!-- <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label> -->
-                <textarea class="form-control form-control-lg" rows="3"></textarea>
-              </div>
 
-            <button class="btn btn-primary btn-lg mb-3" style="width: 100%; height: 50px;" onclick="submit();">Submit</button>
+            <div class="input-group">
+                <input type="text" id="coordinate-display" class="form-control form-control" readonly>
+                <button class="btn btn-primary btn" onclick="requestLocation()">Find Me</button>
+            </div>
 
-        
-            
+            <div class="form-floating">
+                <textarea class="form-control" id="textInput" placeholder="" style="height: 100px"></textarea>
+                <label for="textInput" class="form-label">Write a message</label>
+
+            </div>
+            <button class="btn btn-primary btn" onclick="submitEntry()">Submit Entry</button>
         </div>
-
-
     </div>
 
+    <input type="file" id="image-input" accept="image/*" onchange="loadImage(event)" hidden capture>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
 </body>
 
 <script>
-    const fileInput = document.getElementById('image-upload')
+    const imageInput = document.getElementById("image-input");
+    const imageDisplay = document.getElementById("image-display");
+    const params = new URLSearchParams(window.location.search);
 
     function triggerUpload() {
-        fileInput.click();
+        imageInput.click();
     }
 
-    function loadFile(event) {
-        let image = document.getElementById('output');
-        image.src = URL.createObjectURL(event.target.files[0]);
+    function loadImage(event) {
+        imageDisplay.src = URL.createObjectURL(event.target.files[0]);
     }
-
-    var map = new ol.Map({
-        target: 'map',
-        layers: [
-            new ol.layer.Tile({
-                source: new ol.source.OSM()
-            })
-        ],
-        view: new ol.View({
-            center: ol.proj.fromLonLat([37.41, 8.82]),
-            zoom: 4
-        })
-    });
 
     function requestLocation() {
-        navigator.geolocation.getCurrentPosition(handleLocation);
+        navigator.geolocation.getCurrentPosition(handleLocationSuccess, handleLocationFail);
     }
 
-    function handleLocation(loc) {
-        console.log(loc.coords.latitude, loc.coords.longitude);
-        console.log(fileInput.files[0]);
-
-        const file = fileInput.files[0];
+    function handleLocationSuccess(loc) {
 
         let location = {
             "latitude": loc.coords.latitude,
@@ -104,30 +77,27 @@
             "timestamp": loc.timestamp
         }
 
-        console.log(location);
-
         document.getElementById("coordinate-display").value = `${loc.coords.latitude}, ${loc.coords.longitude}`;
 
-        let fd = new FormData();
-        fd.append("location", JSON.stringify(location));
-        fd.append("file", file);
-
-        fetch('/submit', {
-            method: 'POST',
-            body: fd
-        })
     }
 
+    function handleLocationFail(error) {
+        alert(`${error.code} -> ${error.message}`);
+        console.log(error.code, error.message);
+        error.code;
+        error.message;
+    }
 
-    let params = new URLSearchParams(window.location.search);
+    function submitEntry() {
+
+    }
 
     if (params.has("key")) {
-        let box_id = params.get("key");
-        sessionStorage.setItem("box_key", box_id);
+        let box_key = params.get("key");
+        sessionStorage.setItem("box_key", box_key);
         window.location.replace(window.location.pathname);
     }
 
-    <!-- document.getElementById("key").innerHTML = sessionStorage.getItem("box_key"); -->
 </script>
 
 </html>
