@@ -16,6 +16,10 @@
         font-family: "Open Sans";
         font-weight: 700;
     }
+
+    .filter {
+        filter: drop-shadow(-0.5rem -0.5rem 0 #000000);
+    }
 </style>
 
 <body>
@@ -25,27 +29,63 @@
         </div>
     </nav>
     <div class="container p-3">
-        <div class="d-grid gap-3">
-            <div class="card" style="background-color: grey;">
+        <div class="d-grid">
+            <label for="image-display" class="form-label">Upload an image</label>
+            <div class="card border" id="image-container">
                 <input type="image" src="placeholder.svg" class="rounded-2" id="image-display"
                     onclick="triggerUpload()">
             </div>
 
-            <div class="input-group">
-                <input type="text" id="coordinate-display" class="form-control form-control" readonly>
-                <button class="btn btn-primary btn" onclick="requestLocation()">Find Me</button>
+            <div class="input-group mt-3" hidden>
+                <!-- <label class="input-group-text" for="inputGroupFile01">Upload</label> -->
+                <input type="file" id="image-input" accept="image/*" class="form-control" onchange="loadImage()" capture>
             </div>
 
-            <div class="form-floating">
-                <textarea class="form-control" id="textInput" placeholder="" style="height: 100px"></textarea>
-                <label for="textInput" class="form-label">Write a message</label>
+            <div class="form-text">Tap the image above to take or retake a picture</div>
 
+
+            <!-- <input type="file" id="image-input" accept="image/*" onchange="loadImage(event)" hidden capture> -->
+
+
+            <div class="mt-3">
+                <label for="coordinate-display" class="form-label">Mark your location</label>
+                <div class="input-group" id="coordinate-input">
+                    <input type="text" id="coordinate-display" class="form-control form-control border-end-0"
+                        style="background-color: white;" readonly>
+                    <button class="btn btn-primary btn" onclick="requestLocation()">Find Me!</button>
+                </div>
+                <div class="form-text">Approximate location data is used</div>
+            </div>
+            <div class="my-3">
+                <label for="text-input" class="form-label">Write a message</label>
+                <textarea class="form-control border" id="text-input" placeholder=""
+                    style="height: 200px; resize: none;"></textarea>
+                <div class="form-text" id="validation-message" hidden>Make sure you complete all items!</div>
             </div>
             <button class="btn btn-primary btn" onclick="submitEntry()">Submit Entry</button>
         </div>
     </div>
 
-    <input type="file" id="image-input" accept="image/*" onchange="loadImage(event)" hidden capture>
+    <div class="modal" id="location-error" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Couldn't retrieve your location</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Check your settings and make sure your browser has access to location services. If you denied the
+                    location request, refresh this page and try again!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="window.location.reload()">Refresh</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
@@ -55,14 +95,23 @@
 <script>
     const imageInput = document.getElementById("image-input");
     const imageDisplay = document.getElementById("image-display");
+    const imageContainer = document.getElementById("image-container")
+    const textInput = document.getElementById("text-input");
+    const coordinateDisplay = document.getElementById("coordinate-display")
+    const validationMessage = document.getElementById("validation-message");
     const params = new URLSearchParams(window.location.search);
+    const locationErrorModal = new bootstrap.Modal(document.getElementById('location-error'))
+
+    let geoloc = null;
+
+    coordinateDisplay.value = "";
 
     function triggerUpload() {
         imageInput.click();
     }
 
-    function loadImage(event) {
-        imageDisplay.src = URL.createObjectURL(event.target.files[0]);
+    function loadImage() {
+        imageDisplay.src = URL.createObjectURL(imageInput.files[0]);
     }
 
     function requestLocation() {
@@ -71,25 +120,55 @@
 
     function handleLocationSuccess(loc) {
 
-        let location = {
+        geoloc = {
             "latitude": loc.coords.latitude,
             "longitude": loc.coords.longitude,
             "timestamp": loc.timestamp
         }
 
-        document.getElementById("coordinate-display").value = `${loc.coords.latitude}, ${loc.coords.longitude}`;
+        coordinateDisplay.value = `${loc.coords.latitude}, ${loc.coords.longitude}`;
 
     }
 
     function handleLocationFail(error) {
-        alert(`${error.code} -> ${error.message}`);
-        console.log(error.code, error.message);
         error.code;
         error.message;
+
+        locationErrorModal.show();
+    }
+
+    function validateItem(condition, element) {
+        if (condition) {
+            element.classList.remove("border-danger");
+            element.classList.add("border-success");
+            return true;
+        } else {
+            element.classList.remove("border-success");
+            element.classList.add("border-danger");
+            return false;
+        }
     }
 
     function submitEntry() {
+        let imageValid = validateItem(geoloc, coordinateDisplay);
+        let locationValid = validateItem(textInput.value, textInput);
+        let messageValid = validateItem(imageInput.files[0], imageContainer);
 
+        validationMessage.removeAttribute("hidden");
+
+        if (imageValid && locationValid && messageValid) {
+            validationMessage.classList.remove("text-danger");
+            validationMessage.classList.add("text-success");
+            validationMessage.innerText = "Looks good!";
+        } else {
+            validationMessage.classList.remove("text-success");
+            validationMessage.classList.add("text-danger");
+            validationMessage.innerText = "Make sure you complete all items!";
+        }
+    }
+
+    if (imageInput.files[0]) {
+        loadImage();
     }
 
     if (params.has("key")) {
