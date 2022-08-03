@@ -1,12 +1,14 @@
 from mongoengine import Document
 from mongoengine.fields import (
-    IntField,
+    UUIDField,
+    StringField,
     ReferenceField,
     ListField
 )
 from app.models.entry import EntryModel
 
 class BoxModel(Document):
-    id = IntField(primary_key=True)
+    pub_id  = UUIDField()
+    key     = StringField()
     entries = ListField(ReferenceField(EntryModel))
 

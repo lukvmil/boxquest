@@ -8,8 +8,7 @@ from mongoengine.fields import (
 )
 
 class EntryModel(Document):
-    id          = IntField(primary_key=True)
-    timestamp   = DateTimeField(),
-    location    = GeoPointField(),
-    message     = StringField(),
+    timestamp   = DateTimeField()
+    location    = GeoPointField()
+    message     = StringField()
     image       = ImageField()

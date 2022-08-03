@@ -6,5 +6,8 @@ from mongoengine.fields import (
 from app.models.box import BoxModel
 
 class KeyModel(Document):
-    id = IntField(primary_key=True)
+    _id = IntField(required=True)
     box = ReferenceField(BoxModel)
+
+    def _init__(self, _id):
+        self._id = _id
