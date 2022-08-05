@@ -40,17 +40,58 @@
 </body>
 
 <script>
+    coords = [
+        [40.22, -82.42],
+        [40.24, -79.50],
+        [40.39, -73.59],
+        [38.51, -77.01],
+        [35.46, -78.37]
+    ]
+
+    const features = [];
+
+    coords.forEach(c => {
+        features.push(
+            new ol.Feature({
+                geometry: new ol.geom.Point(
+                    ol.proj.fromLonLat(c.reverse())
+                )
+            }));
+    })
+
+    const pointStyle = new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 4,
+            fill: new ol.style.Fill({
+                color: '#fff',
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#000',
+                width: 2,
+            }),
+        }),
+    })
+
+    const vectorSource = new ol.source.Vector({ features });
+
+    const vectorLayer = new ol.layer.Vector({
+        source: vectorSource,
+        style: pointStyle
+    });
+
     var map = new ol.Map({
         target: 'map',
         layers: [
             new ol.layer.Tile({
                 source: new ol.source.OSM()
-            })
+            }),
+            vectorLayer
         ],
         view: new ol.View({
-            center: ol.proj.fromLonLat([37.41, 8.82]),
+            center: ol.proj.fromLonLat([-75, 35]),
             zoom: 4
         })
+
     });
 </script>
 
