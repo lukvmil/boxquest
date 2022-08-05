@@ -147,9 +147,9 @@
         data.append('file', imageInput.files[0]);
         data.append('geoloc', JSON.stringify(geoloc));
         data.append('message', textInput.value);
-        data.append('box_key', sessionStorage.get("box_key"));
+        data.append('box_key', sessionStorage.getItem("box_key"));
 
-        let box_id = Math.floor(Math.random() * 1000);
+        let box_id = params.get("id");
 
         console.log(geoloc);
 

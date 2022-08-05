@@ -3,10 +3,11 @@ from flask_restful import Resource
 from datetime import datetime
 import json
 from app.common import utils
-from app.models.entry import EntryModel
+from app.models import EntryModel, BoxModel
 
 class CreateEntry(Resource):
     def post(self, box_id):
+        print("yo")
         image = request.files['file']
         geoloc = json.loads(request.form['geoloc'])
         message = request.form['message']
@@ -18,14 +19,16 @@ class CreateEntry(Resource):
         print(box_key)
 
         entry = EntryModel(
-            id = box_id,
             timestamp = datetime.fromtimestamp(int(geoloc['timestamp']) / 1000),
             location = (geoloc['latitude'], geoloc['longitude']),
             message = message,
             image = image
         )
-
         entry.save()
+
+        box = BoxModel.objects(pub_id=box_id).first()
+        box.entries.append(entry)
+        box.save()
 
         return {'success': True}
         

@@ -1,2 +1,2 @@
-from app.models.box import BoxModel
-from app.models.entry import EntryModel
+from app.models.box import *
+from app.models.entry import *

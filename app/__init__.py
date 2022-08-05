@@ -25,7 +25,7 @@ def get_id():
     if 'key' not in request.args: abort(400)
 
     return {
-        'id': BoxModel.objects(key=request.args.get('key')).first().pub_id.hex
+        'pub_id': BoxModel.objects(key=request.args.get('key')).first().pub_id.hex
     }
 
 
