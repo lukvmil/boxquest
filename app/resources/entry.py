@@ -12,6 +12,9 @@ class CreateEntry(Resource):
         message = request.form['message']
         box_key = request.form['box_key']
 
+        print("pulled in the data")
+        print(f'box_id: {box_id}')
+
         entry = EntryModel(
             timestamp = datetime.fromtimestamp(int(geoloc['timestamp']) / 1000),
             location = (geoloc['latitude'], geoloc['longitude']),
@@ -20,7 +23,11 @@ class CreateEntry(Resource):
         )
         entry.save()
 
+        print("saved entry")
+
         box = BoxModel.objects(pub_id=box_id).first()
+
+        print("got box document")
 
         if box.key != box_key: return {'success': False}
 
@@ -31,5 +38,7 @@ class CreateEntry(Resource):
         
 
 class ViewEntry(Resource):
-    def get():
-        ...
+    def get(self, box_id, entry_id):
+        box = BoxModel.objects(pub_id=box_id).first()
+        
+        box.entries[entry_id]

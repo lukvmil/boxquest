@@ -1,22 +1,32 @@
 from flask import Flask, send_file, request
 from flask_restful import Api, abort
-from mongoengine import connect
+from mongoengine import connect, connection
+from gridfs import GridFS, NoFile
+import bson
 from io import BytesIO
 from app.resources.box import ViewBox
 from app.resources.entry import CreateEntry, ViewEntry
 from app.models import BoxModel
 
 connect('boxquest')
+img_fs = GridFS(connection.get_db(), collection="images")
 
 main = Flask('BoxQuest')
 api  = Api(main)
 
-@main.route('/img/<int:bid>-<int:eid>.jpg')
-def get_image(bid, eid):
-    image_binary = EntryModel.objects(id=bid).first().image.read()
+@main.route('/img/<oid_str>')
+def get_image(oid_str):
+    not_found = {'message': 'Invalid image ID'}
+
+    try: oid = bson.ObjectId(oid_str)
+    except bson.errors.InvalidId: return not_found
+    if not img_fs.exists(oid): return not_found
+
+    img = img_fs.get(oid)    
+    img_bin = img.read()
 
     return send_file(
-        BytesIO(image_binary),
+        BytesIO(img_bin),
         mimetype='image/jpeg'
     )
 
@@ -32,4 +42,4 @@ def get_id():
 api.add_resource(ViewBox, '/box/<box_id>')
 api.add_resource(CreateEntry, '/box/<box_id>/entry', '/box/<box_id>/entry/')
 api.add_resource(ViewEntry, '/box/<box_id>/entry/<entry_id>')
-api.add_resource()
+# api.add_resource()
