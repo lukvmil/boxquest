@@ -12,8 +12,8 @@ class CreateEntry(Resource):
         message = request.form['message']
         box_key = request.form['box_key']
 
-        print("pulled in the data")
-        print(f'box_id: {box_id}')
+        box = BoxModel.objects(pub_id=box_id).first()
+        if box.key != box_key: return {'success': False}
 
         entry = EntryModel(
             timestamp = datetime.fromtimestamp(int(geoloc['timestamp']) / 1000),
@@ -22,14 +22,6 @@ class CreateEntry(Resource):
             image = image
         )
         entry.save()
-
-        print("saved entry")
-
-        box = BoxModel.objects(pub_id=box_id).first()
-
-        print("got box document")
-
-        if box.key != box_key: return {'success': False}
 
         box.entries.append(entry)
         box.save()
@@ -40,5 +32,23 @@ class CreateEntry(Resource):
 class ViewEntry(Resource):
     def get(self, box_id, entry_id):
         box = BoxModel.objects(pub_id=box_id).first()
+        entry = box.entries[entry_id]
+
+        return json.loads(entry.to_json())
+
+
+class ViewEntries(Resource):
+    def get(self, box_id):
+        box = BoxModel.objects(pub_id=box_id).first()
+        entries = []
+
+        for e in box.entries:
+            e = json.loads(e.to_json())
+            entries.append({
+                'timestamp': e['timestamp']['$date'],
+                'location': e['location'],
+                'message': e['message'],
+                'image': e['image']['$oid']
+            })
         
-        box.entries[entry_id]
+        return entries

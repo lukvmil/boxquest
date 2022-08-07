@@ -4,8 +4,8 @@ from mongoengine import connect, connection
 from gridfs import GridFS, NoFile
 import bson
 from io import BytesIO
-from app.resources.box import ViewBox
-from app.resources.entry import CreateEntry, ViewEntry
+from app.resources import ViewBox
+from app.resources import CreateEntry, ViewEntry, ViewEntries
 from app.models import BoxModel
 
 connect('boxquest')
@@ -33,13 +33,15 @@ def get_image(oid_str):
 @main.route('/get_id')
 def get_id():
     if 'key' not in request.args: abort(400)
+    box = BoxModel.objects(key=request.args.get('key')).first()
+    if not box: abort(400)
 
     return {
-        'pub_id': BoxModel.objects(key=request.args.get('key')).first().pub_id.hex
+        'pub_id': box.pub_id.hex
     }
 
 
 api.add_resource(ViewBox, '/box/<box_id>')
 api.add_resource(CreateEntry, '/box/<box_id>/entry', '/box/<box_id>/entry/')
-api.add_resource(ViewEntry, '/box/<box_id>/entry/<entry_id>')
-# api.add_resource()
+api.add_resource(ViewEntry, '/box/<box_id>/entry/<int:entry_id>')
+api.add_resource(ViewEntries, '/box/<box_id>/entries')
