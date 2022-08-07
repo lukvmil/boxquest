@@ -191,7 +191,11 @@
     if (params.has("key")) {
         let box_key = params.get("key");
         sessionStorage.setItem("box_key", box_key);
-        window.location.replace(window.location.pathname);
+        fetch(`api/get_id?key=${box_key}`)
+            .then(data => data.json())
+            .then(data => {
+                window.location.replace(`${window.location.pathname}?id=${data.pub_id}`);
+            })
     }
 
 </script>

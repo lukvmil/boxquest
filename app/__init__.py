@@ -32,3 +32,4 @@ def get_id():
 api.add_resource(ViewBox, '/box/<box_id>')
 api.add_resource(CreateEntry, '/box/<box_id>/entry', '/box/<box_id>/entry/')
 api.add_resource(ViewEntry, '/box/<box_id>/entry/<entry_id>')
+api.add_resource()
