@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>boxquest</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Open+Sans" />
+
+</head>
+
+<style>
+    .logo {
+        font-family: "Open Sans";
+        font-weight: 700;
+    }
+
+    .filter {
+        filter: drop-shadow(-0.5rem -0.5rem 0 #000000);
+    }
+</style>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand logo">boxquest</a>
+        </div>
+    </nav>
+    <div class="container p-3">
+        <div class="d-grid">
+            <label for="image-display" class="form-label">Upload an image</label>
+            <div class="card border" id="image-container">
+                <input type="image" src="placeholder.svg" class="rounded-2" id="image-display"
+                    onclick="triggerUpload()">
+            </div>
+
+            <div class="input-group mt-3" hidden>
+                <input type="file" id="image-input" accept="image/*" class="form-control" onchange="loadImage()" capture>
+            </div>
+
+            <div class="form-text">Tap the image above to take or retake a picture</div>
+
+            <div class="mt-3">
+                <label for="coordinate-display" class="form-label">Mark your location</label>
+                <div class="input-group" id="coordinate-input">
+                    <input type="text" id="coordinate-display" class="form-control form-control border-end-0"
+                        style="background-color: white;" readonly>
+                    <button class="btn btn-primary btn" onclick="requestLocation()">Find Me!</button>
+                </div>
+                <div class="form-text">Approximate location data is used</div>
+            </div>
+            <div class="my-3">
+                <label for="text-input" class="form-label">Write a message</label>
+                <textarea class="form-control border" id="text-input" placeholder=""
+                    style="height: 200px; resize: none;"></textarea>
+                <div class="form-text" id="validation-message" hidden>Make sure you complete all items!</div>
+            </div>
+            <button class="btn btn-primary btn" onclick="submitEntry()">Submit Entry</button>
+        </div>
+    </div>
+
+    <div class="modal" id="location-error" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Couldn't retrieve your location</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Check your settings and make sure your browser has access to location services. If you denied the
+                    location request, refresh this page and try again!
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="window.location.reload()">Refresh</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
+</body>
+
+<script>
+    const imageInput = document.getElementById("image-input");
+    const imageDisplay = document.getElementById("image-display");
+    const imageContainer = document.getElementById("image-container")
+    const textInput = document.getElementById("text-input");
+    const coordinateDisplay = document.getElementById("coordinate-display")
+    const validationMessage = document.getElementById("validation-message");
+    const params = new URLSearchParams(window.location.search);
+    const locationErrorModal = new bootstrap.Modal(document.getElementById('location-error'))
+
+    let geoloc = null;
+
+    coordinateDisplay.value = "";
+
+    function triggerUpload() {
+        imageInput.click();
+    }
+
+    function loadImage() {
+        imageDisplay.src = URL.createObjectURL(imageInput.files[0]);
+    }
+
+    function requestLocation() {
+        navigator.geolocation.getCurrentPosition(handleLocationSuccess, handleLocationFail);
+    }
+
+    function handleLocationSuccess(loc) {
+
+        geoloc = {
+            "latitude": loc.coords.latitude,
+            "longitude": loc.coords.longitude,
+            "timestamp": loc.timestamp
+        }
+
+        coordinateDisplay.value = `${loc.coords.latitude}, ${loc.coords.longitude}`;
+
+    }
+
+    function handleLocationFail(error) {
+        error.code;
+        error.message;
+
+        locationErrorModal.show();
+    }
+
+    function validateItem(condition, element) {
+        if (condition) {
+            element.classList.remove("border-danger");
+            element.classList.add("border-success");
+            return true;
+        } else {
+            element.classList.remove("border-success");
+            element.classList.add("border-danger");
+            return false;
+        }
+    }
+
+    function postEntry() {
+        let data = new FormData();
+        data.append('file', imageInput.files[0]);
+        data.append('geoloc', JSON.stringify(geoloc));
+        data.append('message', textInput.value);
+        data.append('box_key', sessionStorage.getItem("box_key"));
+
+        let box_id = params.get("id");
+
+        console.log(geoloc);
+
+        console.log("submitted...")
+
+        fetch(`api/box/${box_id}/entry`, {
+            method: 'POST',
+            body: data
+        })
+            .then(resp => resp.json())
+            .then(data => {
+                console.log(data);
+            })
+    }
+
+    function submitEntry() {
+        let imageValid = validateItem(geoloc, coordinateDisplay);
+        let locationValid = validateItem(textInput.value, textInput);
+        let messageValid = validateItem(imageInput.files[0], imageContainer);
+
+        validationMessage.removeAttribute("hidden");
+
+        if (imageValid && locationValid && messageValid) {
+            validationMessage.classList.remove("text-danger");
+            validationMessage.classList.add("text-success");
+            validationMessage.innerText = "Looks good!";
+            postEntry();
+        } else {
+            validationMessage.classList.remove("text-success");
+            validationMessage.classList.add("text-danger");
+            validationMessage.innerText = "Make sure you complete all items!";
+        }
+    }
+
+    if (imageInput.files[0]) {
+        loadImage();
+    }
+
+    if (params.has("key")) {
+        let box_key = params.get("key");
+        sessionStorage.setItem("box_key", box_key);
+        fetch(`api/get_id?key=${box_key}`)
+            .then(data => data.json())
+            .then(data => {
+                window.location.replace(`${window.location.pathname}?id=${data.pub_id}`);
+            })
+    }
+
+</script>
+
+</html>
