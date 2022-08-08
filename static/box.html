@@ -28,14 +28,14 @@
     </nav>
     <div class="container p-3">
         <div class="d-grid">
-            <label class="form-label">Box history map</label>
+            <!-- <label class="form-label">Box history map</label> -->
 
             <div class="card border" id="map-container">
-                <div id="map" class="map" style="height: 50vh; width: 100%;"></div>
+                <div id="map" class="map" style="height: 30vh; width: 100%;"></div>
             </div>
             <div class="form-text">Tap a marker above to view the entry for that location</div>
 
-            <button class="btn btn-success btn mt-3" onclick="submitEntry()">Add an Entry</button>
+            <button class="btn btn-success btn mt-3" id="add-entry" onclick="location.href='add-entry'+location.search" hidden>Add an Entry</button>
             <!-- <div class="d-flex mt-3">
                 <div class="flex-fill">
                     <button class="btn btn-primary" style="width: 100%;">&lt;</button>
@@ -46,24 +46,78 @@
                 </div>
             </div> -->
             <div class="card border mt-3" id="map-container">
-                <img src="api/img/62f01bb7da6693e25848eecc" class="card-img-top" id="entry-img">
-                <div class="card-body pt-1">
-                    <div class="form-text" id="entry-timestamp"></div>
-                    <p class="card-text mt-1" id="entry-body">this is a cool picture</p>
+                <!-- <div class="card-header">
+                    <ul class="nav nav-pills card-header-pills">
+                        <li class="nav-item me-2">
+                            <a class="nav-link active" href="#">Prev</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Next</a>
+                        </li>
+
+                    </ul>
+                </div> -->
+                <div class="card-body">
+                    <!-- <h5 class="card-title">Card title</h5> -->
+                    <p class="card-text" id="entry-body"></p>
+                    <p class="card-text"><small class="text-muted" id="entry-timestamp"></small></p>
                 </div>
+                <img class="card-img-bottom" id="entry-img">
+
             </div>
         </div>
     </div>
 </body>
 
 <script>
-    const coords = [
-        [40.22, -82.42],
-        [40.24, -79.50],
-        [40.39, -73.59],
-        [38.51, -77.01],
-        [35.46, -78.37]
-    ]
+    const params = new URLSearchParams(window.location.search);
+    const addEntryButton = document.getElementById("add-entry");
+    const entryBody = document.getElementById("entry-body");
+    const entryTimestamp = document.getElementById("entry-timestamp");
+    const entryImage = document.getElementById("entry-img");
+
+    let pointSource;
+    let lineSource;
+    let markerLayer;
+    let dotLayer;
+    let lineLayer;
+
+    const coords = []
+    const entry_list = []
+
+    let map = new ol.Map({
+        target: 'map',
+        layers: [
+            new ol.layer.Tile({
+                source: new ol.source.OSM()
+            })
+        ],
+        view: new ol.View({
+            center: ol.proj.fromLonLat([-75, 35]),
+            zoom: 4
+        })
+
+    });
+
+    if (params.has("id")) {
+        let box_id = params.get("id");
+        fetch(`api/box/${box_id}/entries`)
+            .then(data => data.json())
+            .then(entries => {
+                entries.forEach(e => {
+                    entry_list.push(e);
+                })
+                entries.forEach(e => {
+                    coords.push(e.location.reverse());
+                    entryBody.innerText = e.message;
+                    entryTimestamp.innerText = new Date(e.timestamp).toLocaleString();
+                    entryImage.setAttribute("src", `api/img/${e.image}`);
+                });
+                loadLines();
+                loadPoints();
+            });
+    }
+
 
     const markerStyle = new ol.style.Style({
         image: new ol.style.Circle({
@@ -97,71 +151,90 @@
     const lineFeatures = [];
     const pointFeatures = [];
 
-    coords.forEach(c => {
-        pointFeatures.push(
-            new ol.Feature({
-                geometry: new ol.geom.Point(
-                    ol.proj.fromLonLat(c.reverse())
-                )
-            })
-        );
-    })
+    function loadPoints() {
+        let count = 0;
+        coords.forEach(c => {
+            pointFeatures.push(
+                new ol.Feature({
+                    geometry: new ol.geom.Point(
+                        ol.proj.fromLonLat(c)
+                    ),
+                    name: count
+                })
+            );
+            count += 1;
+        });
+        pointSource = new ol.source.Vector({ features: pointFeatures });
+        map.getView().fit(pointSource.getExtent(), {padding: [100, 100, 100, 100]});
+        markerLayer = new ol.layer.Vector({
+            source: pointSource,
+            style: markerStyle
+        });
 
-    const pointSource = new ol.source.Vector({features: pointFeatures});
+        dotLayer = new ol.layer.Vector({
+            source: pointSource,
+            style: dotStyle
+        });
+        map.addLayer(markerLayer);
+        // map.addLayer(dotLayer);
+        let select = new ol.interaction.Select({
+            condition: ol.events.condition.click,
+            layers: [markerLayer],
+            style: dotStyle
+        });
 
-    for (let i = 0; i < coords.length - 1; i++) {
-        lineFeatures.push(
-            new ol.Feature({
-                geometry: new ol.geom.LineString([
-                    ol.proj.fromLonLat(coords[i]), 
-                    ol.proj.fromLonLat(coords[i+1])
-                ]),
-                name: "linestring"
-            })
-        );
+        map.addInteraction(select);
+
+        select.on('select', e => {
+            let features = e.target.getFeatures().getArray()
+            if (features.length) {
+                let name = features[0].get('name')
+                console.log(name);
+                setActiveEntry(name);
+            }
+        });
     }
 
-    const lineSource = new ol.source.Vector({features: lineFeatures});
+    function setActiveEntry(id) {
+        e = entry_list[id];
+        entryBody.innerText = e.message;
+        entryTimestamp.innerText = new Date(e.timestamp).toLocaleString();
+        entryImage.setAttribute("src", `api/img/${e.image}`);
+    }
+
     
-    const markerLayer = new ol.layer.Vector({
-        source: pointSource,
-        style: markerStyle
-    });
+    function loadLines() {
+        for (let i = 0; i < coords.length - 1; i++) {
+            lineFeatures.push(
+                new ol.Feature({
+                    geometry: new ol.geom.LineString([
+                        ol.proj.fromLonLat(coords[i]),
+                        ol.proj.fromLonLat(coords[i + 1])
+                    ]),
+                })
+            );
+        }
+        lineSource = new ol.source.Vector({ features: lineFeatures });
+        lineLayer = new ol.layer.Vector({
+            source: lineSource,
+            style: lineStyle
+        });
+        map.addLayer(lineLayer);
+    }
 
-    const dotLayer = new ol.layer.Vector({
-        source: pointSource,
-        style: dotStyle
-    });
+    if (params.has("key")) {
+        let box_key = params.get("key");
+        sessionStorage.setItem("box_key", box_key);
+        fetch(`api/get_id?key=${box_key}`)
+            .then(data => data.json())
+            .then(data => {
+                window.location.href = `${window.location.pathname}?id=${data.pub_id}`;
+            })
+    }
 
-    const lineLayer = new ol.layer.Vector({
-        source: lineSource,
-        style: lineStyle
-    })
-
-    var map = new ol.Map({
-        target: 'map',
-        layers: [
-            new ol.layer.Tile({
-                source: new ol.source.OSM()
-            }),
-            lineLayer,
-            markerLayer,
-            dotLayer
-        ],
-        view: new ol.View({
-            center: ol.proj.fromLonLat([-75, 35]),
-            zoom: 4
-        })
-
-    });
-
-    let feature;
-
-    document.getElementById('entry-timestamp').innerText = new Date("2022-08-07T20:07:56.429Z").toLocaleString();
-
-    map.on('click', event => {
-        feature = map.getFeaturesAtPixel(event.pixel)[0];
-    });
+    if (sessionStorage.getItem("box_key")) {
+        addEntryButton.removeAttribute("hidden");
+    }
 
 </script>
 

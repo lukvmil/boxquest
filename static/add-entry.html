@@ -162,6 +162,7 @@
             .then(resp => resp.json())
             .then(data => {
                 console.log(data);
+                location.href = `box?id=${box_id}`
             })
     }
 

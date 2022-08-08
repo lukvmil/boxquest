@@ -42,6 +42,8 @@ class ViewEntries(Resource):
         box = BoxModel.objects(pub_id=box_id).first()
         entries = []
 
+        if not box: abort(404)
+
         for e in box.entries:
             e = json.loads(e.to_json())
             entries.append({
