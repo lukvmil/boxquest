@@ -1,13 +1,14 @@
 from flask import request
 from flask_restful import Resource, abort
 from datetime import datetime
+from io import BytesIO
 import json
 from app.common import utils
 from app.models import EntryModel, BoxModel
 
 class CreateEntry(Resource):
     def post(self, box_id):
-        image = request.files['file']
+        raw_image = request.files['file']
         geoloc = json.loads(request.form['geoloc'])
         message = request.form['message']
         box_key = request.form['box_key']
@@ -18,10 +19,11 @@ class CreateEntry(Resource):
         location = utils.obfuscate([geoloc['latitude'], geoloc['longitude']])
         location_str = utils.get_loc_str(location)
         timestamp = datetime.fromtimestamp(int(geoloc['timestamp']) / 1000)
+        image = utils.apply_rotation(raw_image)
 
         entry = EntryModel(timestamp=timestamp, location=location, 
             location_str=location_str, message=message, image=image)
-        
+
         entry.save()
 
         box.entries.append(entry)
