@@ -60,7 +60,10 @@
                 <div class="card-body">
                     <!-- <h5 class="card-title">Card title</h5> -->
                     <p class="card-text" id="entry-body"></p>
-                    <p class="card-text"><small class="text-muted" id="entry-timestamp"></small></p>
+                    <div class="card-text d-flex">
+                        <div><small class="text-muted" id="entry-location"></small></div>
+                        <div class="ms-auto"><small class="text-muted" id="entry-timestamp"></small></div>
+                    </div>
                 </div>
                 <img class="card-img-bottom" id="entry-img">
 
@@ -74,6 +77,7 @@
     const addEntryButton = document.getElementById("add-entry");
     const entryBody = document.getElementById("entry-body");
     const entryTimestamp = document.getElementById("entry-timestamp");
+    const entryLocation = document.getElementById("entry-location");
     const entryImage = document.getElementById("entry-img");
 
     let pointSource;
@@ -94,7 +98,7 @@
         ],
         view: new ol.View({
             center: ol.proj.fromLonLat([-75, 35]),
-            zoom: 4
+            maxZoom: 12
         })
 
     });
@@ -111,6 +115,7 @@
                     coords.push(e.location.reverse());
                     entryBody.innerText = e.message;
                     entryTimestamp.innerText = new Date(e.timestamp).toLocaleString();
+                    entryLocation.innerText = e.location_str;
                     entryImage.setAttribute("src", `api/img/${e.image}`);
                 });
                 loadLines();
@@ -165,7 +170,7 @@
             count += 1;
         });
         pointSource = new ol.source.Vector({ features: pointFeatures });
-        map.getView().fit(pointSource.getExtent(), {padding: [100, 100, 100, 100]});
+        map.getView().fit(pointSource.getExtent(), {padding: [100, 100, 100, 100], maxZoom: 10});
         markerLayer = new ol.layer.Vector({
             source: pointSource,
             style: markerStyle

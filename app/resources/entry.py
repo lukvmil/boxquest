@@ -15,12 +15,13 @@ class CreateEntry(Resource):
         box = BoxModel.objects(pub_id=box_id).first()
         if box.key != box_key: return {'success': False}
 
-        entry = EntryModel(
-            timestamp = datetime.fromtimestamp(int(geoloc['timestamp']) / 1000),
-            location = (geoloc['latitude'], geoloc['longitude']),
-            message = message,
-            image = image
-        )
+        location = utils.obfuscate([geoloc['latitude'], geoloc['longitude']])
+        location_str = utils.get_loc_str(location)
+        timestamp = datetime.fromtimestamp(int(geoloc['timestamp']) / 1000)
+
+        entry = EntryModel(timestamp=timestamp, location=location, 
+            location_str=location_str, message=message, image=image)
+        
         entry.save()
 
         box.entries.append(entry)
@@ -49,6 +50,7 @@ class ViewEntries(Resource):
             entries.append({
                 'timestamp': e['timestamp']['$date'],
                 'location': e['location'],
+                'location_str': e['location_str'],
                 'message': e['message'],
                 'image': e['image']['$oid']
             })
