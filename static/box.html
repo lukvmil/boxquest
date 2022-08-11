@@ -97,7 +97,8 @@
             })
         ],
         view: new ol.View({
-            center: ol.proj.fromLonLat([-75, 35]),
+            center: ol.proj.fromLonLat([-95, 37]),
+            zoom: 3,
             maxZoom: 12
         })
 
@@ -110,16 +111,16 @@
             .then(entries => {
                 entries.forEach(e => {
                     entry_list.push(e);
-                })
-                entries.forEach(e => {
                     coords.push(e.location.reverse());
                     entryBody.innerText = e.message;
                     entryTimestamp.innerText = new Date(e.timestamp).toLocaleString();
                     entryLocation.innerText = e.location_str;
                     entryImage.setAttribute("src", `api/img/${e.image}`);
                 });
-                loadLines();
-                loadPoints();
+                if (entries.length) {
+                    loadLines();
+                    loadPoints();
+                }
             });
     }
 
