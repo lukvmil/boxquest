@@ -32,11 +32,10 @@
         <div class="d-grid">
             <label for="image-display" class="form-label">Upload an image</label>
             <div class="card border" id="image-container">
-                <input type="image" src="placeholder.svg" class="rounded-2" id="image-display"
-                    onclick="triggerUpload()">
+                <img src="placeholder.svg" class="card-img" id="image-display" onclick="triggerUpload()">
             </div>
 
-            <div class="input-group mt-3" hidden>
+            <div class="input-group" hidden>
                 <input type="file" id="image-input" accept="image/*" class="form-control" onchange="loadImage()" capture>
             </div>
 
