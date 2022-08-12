@@ -68,8 +68,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Check your settings and make sure your browser has access to location services. If you denied the
-                    location request, refresh this page and try again!
+                    Make sure location services are enabled and allowed for your browser.
+                    <ul>
+                        <li>On iOS: Settings &gt; Privacy &gt; Location Services</li>
+                        <li>On Android: Settings &gt; Location &gt; App permissions</li>
+                    </ul>
+                    If you are still receiving this error, check your in browser settings to ensure location permissions are enabled for this site.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" onclick="window.location.reload()">Refresh</button>
