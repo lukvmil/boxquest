@@ -99,7 +99,7 @@
         view: new ol.View({
             center: ol.proj.fromLonLat([-95, 37]),
             zoom: 3,
-            maxZoom: 12
+            maxZoom: 16
         })
 
     });
@@ -112,11 +112,8 @@
                 entries.forEach(e => {
                     entry_list.push(e);
                     coords.push(e.location.reverse());
-                    entryBody.innerText = e.message;
-                    entryTimestamp.innerText = new Date(e.timestamp).toLocaleString();
-                    entryLocation.innerText = e.location_str;
-                    entryImage.setAttribute("src", `api/img/${e.image}`);
                 });
+                setActiveEntry(entries.length - 1);
                 if (entries.length) {
                     loadLines();
                     loadPoints();
@@ -171,7 +168,7 @@
             count += 1;
         });
         pointSource = new ol.source.Vector({ features: pointFeatures });
-        map.getView().fit(pointSource.getExtent(), {padding: [100, 100, 100, 100], maxZoom: 10});
+        map.getView().fit(pointSource.getExtent(), {padding: [100, 100, 100, 100], maxZoom: 14});
         markerLayer = new ol.layer.Vector({
             source: pointSource,
             style: markerStyle
@@ -205,6 +202,7 @@
         e = entry_list[id];
         entryBody.innerText = e.message;
         entryTimestamp.innerText = new Date(e.timestamp).toLocaleString();
+        entryLocation.innerText = e.location_str;
         entryImage.setAttribute("src", `api/img/${e.image}`);
     }
 

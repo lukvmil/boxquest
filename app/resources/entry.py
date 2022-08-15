@@ -16,7 +16,7 @@ class CreateEntry(Resource):
         box = BoxModel.objects(pub_id=box_id).first()
         if box.key != box_key: return {'success': False}
 
-        location = utils.obfuscate([geoloc['latitude'], geoloc['longitude']])
+        location = [geoloc['latitude'], geoloc['longitude']]
         location_str = utils.get_loc_str(location)
         timestamp = datetime.fromtimestamp(int(geoloc['timestamp']) / 1000)
         image = utils.apply_rotation(raw_image)
@@ -48,6 +48,7 @@ class ViewEntries(Resource):
         if not box: abort(404)
 
         for e in box.entries:
+            if not type(e) is EntryModel: continue
             e = json.loads(e.to_json())
             entries.append({
                 'timestamp': e['timestamp']['$date'],

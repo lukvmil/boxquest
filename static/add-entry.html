@@ -36,19 +36,22 @@
             </div>
 
             <div class="input-group" hidden>
-                <input type="file" id="image-input" accept="image/*" class="form-control" onchange="loadImage()" capture>
+                <input type="file" id="image-input" accept="image/*" class="form-control" onchange="loadImage(event)" capture>
             </div>
 
             <div class="form-text">Tap the image above to take or retake a picture</div>
 
             <div class="mt-3">
-                <label for="coordinate-display" class="form-label">Mark your location</label>
+                <label for="coordinate-display" class="form-label">Record your location</label>
                 <div class="input-group" id="coordinate-input">
                     <input type="text" id="coordinate-display" class="form-control form-control border-end-0"
                         style="background-color: white;" readonly>
                     <button class="btn btn-primary btn" onclick="requestLocation()">Find Me!</button>
                 </div>
-                <div class="form-text">Approximate location data is used</div>
+                <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" role="switch" id="precise-location-toggle" onchange="handlePrecision(this.checked)" checked>
+                    <label class="form-check-label" for="precise-location-toggle">Use precise location</label>
+                  </div>                  
             </div>
             <div class="my-3">
                 <label for="text-input" class="form-label">Write a message</label>
@@ -98,7 +101,8 @@
     const params = new URLSearchParams(window.location.search);
     const locationErrorModal = new bootstrap.Modal(document.getElementById('location-error'))
 
-    let geoloc = null;
+    let raw_geoloc;
+    let geoloc;
 
     coordinateDisplay.value = "";
 
@@ -115,15 +119,38 @@
     }
 
     function handleLocationSuccess(loc) {
-
-        geoloc = {
+        raw_geoloc = {
             "latitude": loc.coords.latitude,
             "longitude": loc.coords.longitude,
             "timestamp": loc.timestamp
         }
 
-        coordinateDisplay.value = `${loc.coords.latitude}, ${loc.coords.longitude}`;
+        handlePrecision(true);
+    }
 
+    function roundTo(number, places) {
+        factor = 10 ** places;
+        return Math.round(number * factor) / factor; 
+    }
+
+    function handlePrecision(enabled) {
+        let lon, lat;
+
+        if (enabled) {
+            lon = roundTo(raw_geoloc.longitude, 5);
+            lat = roundTo(raw_geoloc.latitude, 5);
+        } else {
+            lon = roundTo(raw_geoloc.longitude, 2) + Math.floor(Math.random() * 10) / 10 ** 3;
+            lat = roundTo(raw_geoloc.latitude, 2) + Math.floor(Math.random() * 10) / 10 ** 3;
+        }
+
+        geoloc = {
+            "latitude": lat,
+            "longitude": lon,
+            "timestamp": raw_geoloc.timestamp
+        }
+
+        coordinateDisplay.value = `${lat}, ${lon}`;
     }
 
     function handleLocationFail(error) {
