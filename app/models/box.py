@@ -8,7 +8,7 @@ from mongoengine.fields import (
 from app.models.entry import EntryModel
 
 class BoxModel(Document):
-    pub_id  = UUIDField()
+    pub_id  = StringField(primary_key=True)
     key     = StringField()
     entries = ListField(ReferenceField(EntryModel))
 

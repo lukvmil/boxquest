@@ -36,7 +36,7 @@ def get_loc_str(coord):
 def apply_rotation(image):
     img = Image.open(image)
     exif_data = img.getexif()
-    orientation = exif_data[274]
+    orientation = exif_data.get(274)
 
     if orientation == 3: 
         img = img.transpose(Image.Transpose.ROTATE_180)

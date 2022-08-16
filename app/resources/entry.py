@@ -45,7 +45,7 @@ class ViewEntries(Resource):
         box = BoxModel.objects(pub_id=box_id).first()
         entries = []
 
-        if not box: abort(404)
+        if not box: abort(404, message='Box not found.')
 
         for e in box.entries:
             if not type(e) is EntryModel: continue

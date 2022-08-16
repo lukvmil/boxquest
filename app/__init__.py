@@ -32,12 +32,12 @@ def get_image(oid_str):
 
 @main.route('/get_id')
 def get_id():
-    if 'key' not in request.args: abort(400)
+    if 'key' not in request.args: abort(400, message='Missing query param: key.')
     box = BoxModel.objects(key=request.args.get('key')).first()
-    if not box: abort(400)
+    if not box: abort(400, message='Invalid key.')
 
     return {
-        'pub_id': box.pub_id.hex
+        'id': box.id
     }
 
 
