@@ -39,7 +39,7 @@ function generateCarouselItems(count) {
 function loadEntryImage(id) {
     let entryImage = entryImages.children[id];
     if (entryImage.loaded) {return}
-    entryImage.children[0].src = `api/img/${entryList[id].image}`;
+    entryImage.children[0].src = `/api/img/${entryList[id].image}`;
     entryImage.loaded = true;
 }
 
@@ -91,10 +91,10 @@ function setActiveEntry(id, from) {
 if (params.has("k")) {
     let box_key = params.get("k");
     sessionStorage.setItem("box_key", box_key);
-    fetch(`api/get_id?key=${box_key}`)
+    fetch(`/api/get_id?key=${box_key}`)
         .then(resp => resp.json())
         .then(data => {
-            window.location.href = `${window.location.pathname}?id=${data.id}`;
+            window.location.replace(`${window.location.pathname}?id=${data.id}`, '');
         })
 }
 
@@ -104,7 +104,7 @@ if (sessionStorage.getItem("box_key")) {
 
 if (params.has("id")) {
     let box_id = params.get("id");
-    fetch(`api/box/${box_id}/entries`)
+    fetch(`/api/box/${box_id}/entries`)
         .then(resp => {
             if (resp.status == 200) {
                 return resp.json();
