@@ -41,7 +41,6 @@ function loadEntryImage(id) {
     if (entryImage.loaded) {return}
     entryImage.children[0].src = `api/img/${entryList[id].image}`;
     entryImage.loaded = true;
-    console.log("loaded image " + id);
 }
 
 function loadProximateImages(id) {
@@ -69,7 +68,17 @@ function loadProximateImages(id) {
     proximateImages.forEach(id => loadEntryImage(id));
 }
 
-function setActiveEntry(id) {
+function setActiveEntry(id, from) {
+    if (from == "map") {
+        entryCarousel.to(id);
+    }
+
+    if (from == "carousel") {
+
+    }
+
+    loadProximateImages(id);
+
     activeEntryId = id;
     e = entryList[activeEntryId];
     if (!e) {return}
@@ -100,11 +109,14 @@ if (params.has("id")) {
             if (resp.status == 200) {
                 return resp.json();
             } else {
-                
+                return null;
             }
         })
         .then(entries => {
             console.log(`Loaded ${entries.length} entries`)
+            if (!entries || !entries.length) {
+                return;
+            }
             generateCarouselItems(entries.length);
             entries.forEach((e, i) => {
                 entryList.push(e);
@@ -116,14 +128,13 @@ if (params.has("id")) {
                 loadLines();
                 loadPoints();
             }
-            // entryCarousel.to(0);
         });
 }
 
 
 entryControls.addEventListener("slide.bs.carousel", event => {
-    console.log(event.to);
-    loadProximateImages(event.to);
+    console.log("Carousel select: " + event.to);
+    setActiveEntry(event.to);
 })
 
 
@@ -212,8 +223,8 @@ function loadPoints() {
         let features = e.target.getFeatures().getArray()
         if (features.length) {
             let name = features[0].get('name')
-            console.log(name);
-            setActiveEntry(name);
+            console.log("Map select: " + name);
+            setActiveEntry(name, "map");
         }
     });
 }

@@ -93,14 +93,14 @@ function postEntry() {
 
     console.log("submitted...")
 
-    fetch(`api/box/${box_id}/entry`, {
+    fetch(`/api/box/${box_id}/entry`, {
         method: 'POST',
         body: data
     })
         .then(resp => resp.json())
         .then(data => {
             console.log(data);
-            location.href = `box?id=${box_id}`
+            location.href = `/box?id=${box_id}`
         })
 }
 
@@ -126,14 +126,4 @@ function submitEntry() {
 
 if (imageInput.files[0]) {
     loadImage();
-}
-
-if (params.has("key")) {
-    let box_key = params.get("key");
-    sessionStorage.setItem("box_key", box_key);
-    fetch(`api/get_id?key=${box_key}`)
-        .then(data => data.json())
-        .then(data => {
-            window.location.replace(`${window.location.pathname}?id=${data.pub_id}`);
-        })
 }
