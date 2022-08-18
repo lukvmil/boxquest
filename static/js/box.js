@@ -1,4 +1,3 @@
-const params = new URLSearchParams(window.location.search);
 const addEntryButton = document.getElementById("add-entry");
 const entryBody = document.getElementById("entry-body");
 const entryTimestamp = document.getElementById("entry-timestamp");
@@ -88,35 +87,18 @@ function setActiveEntry(id, from) {
     // entryImage.setAttribute("src", `api/img/${e.image}`);
 }
 
-if (params.has("k")) {
-    let box_key = params.get("k");
-    sessionStorage.setItem("box_key", box_key);
-    fetch(`/api/get_id?key=${box_key}`)
-        .then(resp => resp.json())
-        .then(data => {
-            window.location.replace(`${window.location.pathname}?id=${data.id}`, '');
-        })
-}
-
 if (sessionStorage.getItem("box_key")) {
     addEntryButton.removeAttribute("hidden");
 }
 
 if (params.has("id")) {
     let box_id = params.get("id");
+
     fetch(`/api/box/${box_id}/entries`)
-        .then(resp => {
-            if (resp.status == 200) {
-                return resp.json();
-            } else {
-                return null;
-            }
-        })
+        .then(resp => resp.status == 200 ? resp.json : null)
         .then(entries => {
+            if (!entries || entries.length) {return;}
             console.log(`Loaded ${entries.length} entries`)
-            if (!entries || !entries.length) {
-                return;
-            }
             generateCarouselItems(entries.length);
             entries.forEach((e, i) => {
                 entryList.push(e);

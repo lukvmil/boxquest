@@ -38,7 +38,7 @@ function handleLocationSuccess(loc) {
 
 function roundTo(number, places) {
     factor = 10 ** places;
-    return Math.round(number * factor) / factor; 
+    return Math.round(number * factor) / factor;
 }
 
 function handlePrecision(enabled) {
@@ -97,10 +97,11 @@ function postEntry() {
         method: 'POST',
         body: data
     })
-        .then(resp => resp.json())
+        .then(resp => resp.status == 200 ? resp.json : null)
         .then(data => {
             console.log(data);
-            location.href = `/box?id=${box_id}`
+            sessionStorage.setItem("box_key", null);
+            location.href = `/box?id=${box_id}`;
         })
 }
 
