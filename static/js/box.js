@@ -1,3 +1,4 @@
+const params = new URLSearchParams(location.search);
 const addEntryButton = document.getElementById("add-entry");
 const entryBody = document.getElementById("entry-body");
 const entryTimestamp = document.getElementById("entry-timestamp");
@@ -8,6 +9,7 @@ const entryCarousel= new bootstrap.Carousel(entryControls);
 
 const loadProximity = 1;
 
+let boxData;
 let pointSource;
 let lineSource;
 let markerLayer;
@@ -87,17 +89,31 @@ function setActiveEntry(id, from) {
     // entryImage.setAttribute("src", `api/img/${e.image}`);
 }
 
-if (sessionStorage.getItem("box_key")) {
-    addEntryButton.removeAttribute("hidden");
-}
 
+if (params.has("k")) {
+    let box_key = params.get("k");
+    sessionStorage.setItem("box_key", box_key);
+    fetch(`/api/get_id?key=${box_key}`)
+        .then(resp => resp.json())
+        .then(data => {
+            location.replace(`${location.pathname}?id=${data.id}`, '');
+        })
+}
 if (params.has("id")) {
     let box_id = params.get("id");
+    fetch(`/api/box/${box_id}`)
+        .then(resp => resp.status == 200 ? resp.json() : null)
+        .then(box => {
+            boxData = box;
+            if (!box.active && sessionStorage.getItem('box_key')) {
+                location.href = '/box/activate' + location.search;
+            }
+        });
 
     fetch(`/api/box/${box_id}/entries`)
-        .then(resp => resp.status == 200 ? resp.json : null)
+        .then(resp => resp.status == 200 ? resp.json() : null)
         .then(entries => {
-            if (!entries || entries.length) {return;}
+            if (!entries || !entries.length) {return;}
             console.log(`Loaded ${entries.length} entries`)
             generateCarouselItems(entries.length);
             entries.forEach((e, i) => {
@@ -113,6 +129,9 @@ if (params.has("id")) {
         });
 }
 
+if (sessionStorage.getItem("box_key")) {
+    addEntryButton.removeAttribute("hidden");
+}
 
 entryControls.addEventListener("slide.bs.carousel", event => {
     console.log("Carousel select: " + event.to);

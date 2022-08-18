@@ -97,7 +97,7 @@ function postEntry() {
         method: 'POST',
         body: data
     })
-        .then(resp => resp.status == 200 ? resp.json : null)
+        .then(resp => resp.status == 200 ? resp.json() : null)
         .then(data => {
             console.log(data);
             sessionStorage.setItem("box_key", null);
