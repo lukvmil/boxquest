@@ -1,11 +1,40 @@
-from flask_restful import Resource
+from flask import request
+from flask_restful import Resource, abort
+import json
 from app.models import BoxModel
 
-class ViewBox(Resource):
+class InteractBox(Resource):
     def get(self, box_id):
         box = BoxModel.objects(pub_id=box_id).first()
-        if not box: return 404
+        if not box: abort(404, message='Box not found.')
 
-        
+        if box.active:
+            return {
+                'active': box.active,
+                'public': box.public,
+                'quest': box.quest,
+                'guide': box.guide
+            }
+        else:
+            return {
+                'active': False
+            }
+    
+    def post(self, box_id):
+        public = True if request.form['public'] == 'true' else False
+        quest = request.form['quest']
+        guide = request.form['guide']
+        box_key = request.form['box_key']
 
-        return "here is some text"
+        box = BoxModel.objects(pub_id=box_id).first()
+        if not box: abort(404, message='Box not found.')
+        if box.key != box_key: abort(403, message='Invalid key.')
+
+        box.public = public
+        box.quest = quest
+        box.guide = guide
+        box.active = True
+
+        box.save()
+
+        return {'success': True}

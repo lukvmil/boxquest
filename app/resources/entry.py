@@ -14,7 +14,8 @@ class CreateEntry(Resource):
         box_key = request.form['box_key']
 
         box = BoxModel.objects(pub_id=box_id).first()
-        if box.key != box_key: return {'success': False}
+        if not box: abort(404, message='Box not found.')
+        if box.key != box_key: abort(403, message='Invalid key.')
 
         location = [geoloc['latitude'], geoloc['longitude']]
         location_str = utils.get_loc_str(location)

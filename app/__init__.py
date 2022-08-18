@@ -4,8 +4,7 @@ from mongoengine import connect, connection
 from gridfs import GridFS, NoFile
 import bson
 from io import BytesIO
-from app.resources import ViewBox
-from app.resources import CreateEntry, ViewEntry, ViewEntries
+from app.resources import *
 from app.models import BoxModel
 
 connect('boxquest')
@@ -41,7 +40,7 @@ def get_id():
     }
 
 
-api.add_resource(ViewBox, '/box/<box_id>')
+api.add_resource(InteractBox, '/box/<box_id>')
 api.add_resource(CreateEntry, '/box/<box_id>/entry', '/box/<box_id>/entry/')
 api.add_resource(ViewEntry, '/box/<box_id>/entry/<int:entry_id>')
 api.add_resource(ViewEntries, '/box/<box_id>/entries')
