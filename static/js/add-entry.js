@@ -8,9 +8,12 @@ const submitButton = document.getElementById("submit-button");
 const loadingIcon = document.getElementById("loading-icon");
 const params = new URLSearchParams(window.location.search);
 const locationErrorModal = new bootstrap.Modal(document.getElementById('location-error'))
+const questText = document.getElementById("quest-text");
+const guideText = document.getElementById("guide-text");
 
-let raw_geoloc;
+let rawGeoloc;
 let geoloc;
+let boxData
 
 coordinateDisplay.value = "";
 
@@ -27,7 +30,7 @@ function requestLocation() {
 }
 
 function handleLocationSuccess(loc) {
-    raw_geoloc = {
+    rawGeoloc = {
         "latitude": loc.coords.latitude,
         "longitude": loc.coords.longitude,
         "timestamp": loc.timestamp
@@ -45,17 +48,17 @@ function handlePrecision(enabled) {
     let lon, lat;
 
     if (enabled) {
-        lon = roundTo(raw_geoloc.longitude, 5);
-        lat = roundTo(raw_geoloc.latitude, 5);
+        lon = roundTo(rawGeoloc.longitude, 5);
+        lat = roundTo(rawGeoloc.latitude, 5);
     } else {
-        lon = roundTo(raw_geoloc.longitude, 2) + Math.floor(Math.random() * 10) / 10 ** 3;
-        lat = roundTo(raw_geoloc.latitude, 2) + Math.floor(Math.random() * 10) / 10 ** 3;
+        lon = roundTo(rawGeoloc.longitude, 2) + Math.floor(Math.random() * 10) / 10 ** 3;
+        lat = roundTo(rawGeoloc.latitude, 2) + Math.floor(Math.random() * 10) / 10 ** 3;
     }
 
     geoloc = {
         "latitude": lat,
         "longitude": lon,
-        "timestamp": raw_geoloc.timestamp
+        "timestamp": rawGeoloc.timestamp
     }
 
     coordinateDisplay.value = `${lat}, ${lon}`;
@@ -124,6 +127,21 @@ function submitEntry() {
         validationMessage.innerText = "Make sure you complete all items!";
     }
 }
+
+if (params.has("id")) {
+    let box_id = params.get("id");
+    fetch(`/api/box/${box_id}`)
+        .then(resp => resp.status == 200 ? resp.json() : null)
+        .then(box => {
+            if (!box.active && sessionStorage.getItem('box_key')) {
+                location.href = '/box/activate' + location.search;
+            }
+            boxData = box;
+            questText.innerText = box.quest;
+            guideText.innerText = box.guide;
+        });
+}
+
 
 if (imageInput.files[0]) {
     loadImage();
