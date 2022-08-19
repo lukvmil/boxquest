@@ -16,6 +16,7 @@ let lineSource;
 let markerLayer;
 let lineLayer;
 let activeEntryId;
+let mapSelect;
 
 const coords = []
 const entryList = []
@@ -75,7 +76,8 @@ function setActiveEntry(id, from) {
     }
 
     if (from == "carousel") {
-
+        mapSelect.getFeatures().clear();
+        mapSelect.getFeatures().push(pointFeatures[id]);
     }
 
     loadProximateImages(id);
@@ -130,11 +132,11 @@ if (params.has("id")) {
                 coords.push(e.location.reverse());
             });
             loadProximateImages(entries.length - 1);
-            setActiveEntry(entries.length - 1);
             if (entries.length) {
                 loadLines();
                 loadPoints();
             }
+            setActiveEntry(entries.length - 1, "carousel");
         });
 }
 
@@ -150,8 +152,7 @@ if (sessionStorage.getItem("box_key")) {
 }
 
 entryControls.addEventListener("slide.bs.carousel", event => {
-    console.log("Carousel select: " + event.to);
-    setActiveEntry(event.to);
+    setActiveEntry(event.to, "carousel");
 })
 
 
@@ -237,19 +238,18 @@ function loadPoints() {
     });
 
     map.addLayer(markerLayer);
-    let select = new ol.interaction.Select({
+    mapSelect = new ol.interaction.Select({
         condition: ol.events.condition.click,
         layers: [markerLayer],
         style: selectedStyle
     });
 
-    map.addInteraction(select);
+    map.addInteraction(mapSelect);
 
-    select.on('select', e => {
+    mapSelect.on('select', e => {
         let features = e.target.getFeatures().getArray()
         if (features.length) {
             let name = features[0].get('name')
-            console.log("Map select: " + name);
             setActiveEntry(name, "map");
         }
     });
