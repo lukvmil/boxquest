@@ -14,7 +14,6 @@ let boxData;
 let pointSource;
 let lineSource;
 let markerLayer;
-let dotLayer;
 let lineLayer;
 let activeEntryId;
 
@@ -184,14 +183,28 @@ const markerStyle = new ol.style.Style({
     }),
 });
 
-const dotStyle = new ol.style.Style({
-    image: new ol.style.Circle({
-        radius: 4,
-        fill: new ol.style.Fill({
-            color: '#000',
+const selectedStyle = [
+    new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 10,
+            fill: new ol.style.Fill({
+                color: '#fff'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#212529',
+                width: 4
+            })
+        })
+    }),
+    new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 4,
+            fill: new ol.style.Fill({
+                color: '#000',
+            })
         })
     })
-});
+]
 
 const lineStyle = new ol.style.Style({
     stroke: new ol.style.Stroke({
@@ -223,16 +236,11 @@ function loadPoints() {
         style: markerStyle
     });
 
-    dotLayer = new ol.layer.Vector({
-        source: pointSource,
-        style: dotStyle
-    });
     map.addLayer(markerLayer);
-    // map.addLayer(dotLayer);
     let select = new ol.interaction.Select({
         condition: ol.events.condition.click,
         layers: [markerLayer],
-        style: dotStyle
+        style: selectedStyle
     });
 
     map.addInteraction(select);
