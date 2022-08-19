@@ -97,6 +97,13 @@ if (params.has("k")) {
     fetch(`/api/get_id?key=${box_key}`)
         .then(resp => resp.json())
         .then(data => {
+            let knownBoxes = JSON.parse(localStorage.getItem("knownBoxes"));
+            if (knownBoxes) {
+                knownBoxes.push(data.id);
+            } else {
+                knownBoxes = [data.id];
+            }
+            localStorage.setItem("knownBoxes", JSON.stringify(knownBoxes));
             location.replace(`${location.pathname}?id=${data.id}`, '');
         })
 }
@@ -133,7 +140,14 @@ if (params.has("id")) {
 }
 
 if (sessionStorage.getItem("box_key")) {
-    addEntryButton.removeAttribute("hidden");
+    let box_key = sessionStorage.getItem("box_key");
+    fetch(`/api/get_id?key=${box_key}`)
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.id == params.get('id')) {
+                addEntryButton.removeAttribute("hidden");
+            }
+        });
 }
 
 entryControls.addEventListener("slide.bs.carousel", event => {

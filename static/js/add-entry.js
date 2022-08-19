@@ -103,7 +103,7 @@ function postEntry() {
         .then(resp => resp.status == 200 ? resp.json() : null)
         .then(data => {
             console.log(data);
-            sessionStorage.setItem("box_key", null);
+            sessionStorage.removeItem("box_key");
             location.href = `/box?id=${box_id}`;
         })
 }
