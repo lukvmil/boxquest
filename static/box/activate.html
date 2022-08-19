@@ -19,8 +19,8 @@
     <div class="container p-3">
         <div class="d-grid">
             <div class="mb-3">
-                <label for="text-input" class="form-label">Set a quest for this thread</label>
-                <input type="text" class="form-control">
+                <label for="quest-input" class="form-label">Set a quest for this thread</label>
+                <input type="text" class="form-control" id="quest-input">
                 <div class="form-text">A quest can be a goal for the thread to achieve, or just a discussion topic</div>
             </div>
             <!-- </div>
@@ -46,8 +46,8 @@
                 </div>
             </div> -->
             <div class="mb-3">
-                <label for="text-input" class="form-label">Write instructions for the quest</label>
-                <textarea class="form-control border" id="text-input" rows="4" style="resize: none;"></textarea>
+                <label for="guide-input" class="form-label">Write instructions for the quest</label>
+                <textarea class="form-control border" id="guide-input" rows="4" style="resize: none;"></textarea>
                 <div class="form-text">Elaborate </div>
             </div>
             <div class="mb-3">
@@ -57,9 +57,10 @@
                 </div>
                 <div class="form-text">Non-public threads aren't searchable, but can be viewed by anyone with the link
                 </div>
+                <div class="form-text" id="validation-message" hidden>Make sure you complete all items!</div>
             </div>
 
-            <button class="btn btn-primary btn" id="submit-button" onclick="submitEntry()">Activate!<div
+            <button class="btn btn-primary btn" id="submit-button" onclick="submitActivate()">Activate!<div
                     class="spinner-border spinner-border-sm ms-2" role="status" id="loading-icon" hidden></div></button>
         </div>
     </div>

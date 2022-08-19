@@ -21,9 +21,14 @@
     </nav>
     <div class="container p-3">
         <div class="d-grid">
-            <!-- <label class="form-label">Box history map</label> -->
+            <div class="card border">
+                <div class="card-body">
+                    <h6 class="card-subtitle text-muted mb-2">The quest for this thread is...</h6>
+                    <h5 class="card-title" id="quest-text"></h5>
+                </div>
+            </div>
 
-            <div class="card border" id="map-container">
+            <div class="card border mt-3" id="map-container">
                 <div id="map" class="map" style="height: 30vh; width: 100%;"></div>
             </div>
             <div class="form-text">Tap a marker above to view the entry for that location</div>
@@ -31,7 +36,9 @@
             <button class="btn btn-success btn mt-3" id="add-entry" onclick="location.href='/box/add-entry'+location.search"
                 hidden>Add an Entry</button>
 
-            <div class="card border mt-3" id="map-container">
+            
+
+            <div class="card border mt-3">
 
                 <div class="card-body">
                     <!-- <h5 class="card-title">Card title</h5> -->
@@ -65,5 +72,4 @@
     integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
     crossorigin="anonymous"></script>
 <script src="/js/box.js"></script>
-
 </html>

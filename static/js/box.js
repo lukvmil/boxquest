@@ -6,6 +6,7 @@ const entryLocation = document.getElementById("entry-location");
 const entryImages = document.getElementById("entry-images");
 const entryControls = document.getElementById("entryControls");
 const entryCarousel= new bootstrap.Carousel(entryControls);
+const questText = document.getElementById("quest-text");
 
 const loadProximity = 1;
 
@@ -99,15 +100,17 @@ if (params.has("k")) {
             location.replace(`${location.pathname}?id=${data.id}`, '');
         })
 }
+
 if (params.has("id")) {
     let box_id = params.get("id");
     fetch(`/api/box/${box_id}`)
         .then(resp => resp.status == 200 ? resp.json() : null)
         .then(box => {
-            boxData = box;
             if (!box.active && sessionStorage.getItem('box_key')) {
                 location.href = '/box/activate' + location.search;
             }
+            boxData = box;
+            questText.innerText = box.quest;
         });
 
     fetch(`/api/box/${box_id}/entries`)
