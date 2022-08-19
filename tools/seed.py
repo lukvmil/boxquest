@@ -14,8 +14,15 @@ def create_box(key):
         key=key
     )
     box.save()
-    print(f'{box.key} -> {box.pub_id}')
+    return box
 
-for k in keys:
-    # print(k)
-    create_box(k)
+count = 0
+for i, k in enumerate(keys):
+    box = create_box(k)
+    if len(keys) < 1000:
+        print(f'{box.key} -> {box.pub_id}')
+    else:
+        if (i % (len(keys) // 100) == 0):
+            print(str(count) + "% " + str(i) + "/" + str(len(keys)))
+            count += 1
+
