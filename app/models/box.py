@@ -1,6 +1,5 @@
 from mongoengine import Document
 from mongoengine.fields import (
-    UUIDField,
     StringField,
     BooleanField,
     ReferenceField,

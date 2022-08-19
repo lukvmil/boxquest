@@ -1,8 +1,9 @@
 import secrets
 import json
+import sys
 
 keys = []
-count = 100
+count = int(sys.argv[1])
 
 for i in range(count):
     k = secrets.token_urlsafe(24)
