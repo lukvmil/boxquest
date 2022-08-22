@@ -14,9 +14,9 @@ let boxData;
 let pointSource;
 let lineSource;
 let markerLayer;
-let dotLayer;
 let lineLayer;
 let activeEntryId;
+let mapSelect;
 
 const coords = []
 const entryList = []
@@ -76,7 +76,8 @@ function setActiveEntry(id, from) {
     }
 
     if (from == "carousel") {
-
+        mapSelect.getFeatures().clear();
+        mapSelect.getFeatures().push(pointFeatures[id]);
     }
 
     loadProximateImages(id);
@@ -131,11 +132,11 @@ if (params.has("id")) {
                 coords.push(e.location.reverse());
             });
             loadProximateImages(entries.length - 1);
-            setActiveEntry(entries.length - 1);
             if (entries.length) {
                 loadLines();
                 loadPoints();
             }
+            setActiveEntry(entries.length - 1, "carousel");
         });
 }
 
@@ -151,8 +152,7 @@ if (sessionStorage.getItem("box_key")) {
 }
 
 entryControls.addEventListener("slide.bs.carousel", event => {
-    console.log("Carousel select: " + event.to);
-    setActiveEntry(event.to);
+    setActiveEntry(event.to, "carousel");
 })
 
 
@@ -184,14 +184,28 @@ const markerStyle = new ol.style.Style({
     }),
 });
 
-const dotStyle = new ol.style.Style({
-    image: new ol.style.Circle({
-        radius: 4,
-        fill: new ol.style.Fill({
-            color: '#000',
+const selectedStyle = [
+    new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 10,
+            fill: new ol.style.Fill({
+                color: '#fff'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#212529',
+                width: 4
+            })
+        })
+    }),
+    new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 4,
+            fill: new ol.style.Fill({
+                color: '#000',
+            })
         })
     })
-});
+]
 
 const lineStyle = new ol.style.Style({
     stroke: new ol.style.Stroke({
@@ -223,25 +237,19 @@ function loadPoints() {
         style: markerStyle
     });
 
-    dotLayer = new ol.layer.Vector({
-        source: pointSource,
-        style: dotStyle
-    });
     map.addLayer(markerLayer);
-    // map.addLayer(dotLayer);
-    let select = new ol.interaction.Select({
+    mapSelect = new ol.interaction.Select({
         condition: ol.events.condition.click,
         layers: [markerLayer],
-        style: dotStyle
+        style: selectedStyle
     });
 
-    map.addInteraction(select);
+    map.addInteraction(mapSelect);
 
-    select.on('select', e => {
+    mapSelect.on('select', e => {
         let features = e.target.getFeatures().getArray()
         if (features.length) {
             let name = features[0].get('name')
-            console.log("Map select: " + name);
             setActiveEntry(name, "map");
         }
     });
