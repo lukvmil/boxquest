@@ -1,11 +1,5 @@
 from mongoengine import Document
-from mongoengine.fields import (
-    IntField,
-    StringField,
-    DateTimeField,
-    GeoPointField,
-    ImageField
-)
+from mongoengine.fields import *
 
 class EntryModel(Document):
     timestamp    = DateTimeField()

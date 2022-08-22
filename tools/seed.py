@@ -14,15 +14,11 @@ def create_box(key):
         key=key
     )
     box.save()
-    return box
+    return box, pub_id_hex
 
 count = 0
 for i, k in enumerate(keys):
-    box = create_box(k)
-    if len(keys) < 1000:
-        print(f'{box.key} -> {box.pub_id}')
-    else:
-        if (i % (len(keys) // 100) == 0):
-            print(str(count) + "% " + str(i) + "/" + str(len(keys)))
-            count += 1
+    box, hex_id = create_box(k)
+    print(f'{round(i/len(keys) * 100, 1)}% {box.key} -> {hex_id} -> {box.pub_id}')
+    
 

@@ -1,10 +1,5 @@
 from mongoengine import Document
-from mongoengine.fields import (
-    StringField,
-    BooleanField,
-    ReferenceField,
-    ListField
-)
+from mongoengine.fields import *
 from app.models.entry import EntryModel
 
 class BoxModel(Document):
