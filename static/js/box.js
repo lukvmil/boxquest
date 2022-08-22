@@ -6,6 +6,7 @@ const entryLocation = document.getElementById("entry-location");
 const entryImages = document.getElementById("entry-images");
 const entryControls = document.getElementById("entryControls");
 const entryCarousel= new bootstrap.Carousel(entryControls);
+const entryCount = document.getElementById("entry-count");
 const questText = document.getElementById("quest-text");
 
 const loadProximity = 1;
@@ -88,7 +89,7 @@ function setActiveEntry(id, from) {
     entryBody.innerText = e.message;
     entryTimestamp.innerText = new Date(e.timestamp).toLocaleString();
     entryLocation.innerText = e.location_str;
-    // entryImage.setAttribute("src", `api/img/${e.image}`);
+    entryCount.innerText = `#${id+1}/${entryList.length}`;
 }
 
 

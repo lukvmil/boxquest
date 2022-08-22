@@ -10,6 +10,7 @@ const params = new URLSearchParams(window.location.search);
 const locationErrorModal = new bootstrap.Modal(document.getElementById('location-error'))
 const questText = document.getElementById("quest-text");
 const guideText = document.getElementById("guide-text");
+const precisionToggle = document.getElementById("precise-location-toggle");
 
 let rawGeoloc;
 let geoloc;
@@ -36,28 +37,34 @@ function handleLocationSuccess(loc) {
         "timestamp": loc.timestamp
     }
 
-    handlePrecision(true);
+    handlePrecision(precisionToggle.checked);
 }
 
-function roundTo(number, places) {
-    factor = 10 ** places;
-    return Math.round(number * factor) / factor;
-}
 
 function handlePrecision(enabled) {
+    
+    function roundTo(value, digits) {
+        return (Math.round((value * Math.pow(10,digits)).toFixed(digits-1))
+            / Math.pow(10,digits)).toFixed(digits);
+    }
+
+    function randDigit() {
+        return Math.ceil(Math.random() * 9);
+    }
+
     let lon, lat;
 
     if (enabled) {
         lon = roundTo(rawGeoloc.longitude, 5);
         lat = roundTo(rawGeoloc.latitude, 5);
     } else {
-        lon = roundTo(rawGeoloc.longitude, 2) + Math.floor(Math.random() * 10) / 10 ** 3;
-        lat = roundTo(rawGeoloc.latitude, 2) + Math.floor(Math.random() * 10) / 10 ** 3;
+        lon = roundTo(rawGeoloc.longitude + randDigit() / 1000, 3);
+        lat = roundTo(rawGeoloc.latitude  + randDigit() / 1000, 3);
     }
 
     geoloc = {
-        "latitude": lat,
-        "longitude": lon,
+        "latitude": Number(lat),
+        "longitude": Number(lon),
         "timestamp": rawGeoloc.timestamp
     }
 
