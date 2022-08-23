@@ -1,5 +1,6 @@
 const params = new URLSearchParams(location.search);
 const addEntryButton = document.getElementById("add-entry");
+const entryDisplay = document.getElementById("entry-display");
 const entryBody = document.getElementById("entry-body");
 const entryTimestamp = document.getElementById("entry-timestamp");
 const entryLocation = document.getElementById("entry-location");
@@ -10,6 +11,7 @@ const entryCount = document.getElementById("entry-count");
 const questText = document.getElementById("quest-text");
 const introModal = new bootstrap.Modal(document.getElementById('intro-modal'));
 const reportModal = new bootstrap.Modal(document.getElementById('report-modal'));
+const reportSuccessModal = new bootstrap.Modal(document.getElementById('report-success-modal'));
 const reportQuestRadio = document.getElementById("report-quest-radio");
 const reportEntryRadio = document.getElementById("report-entry-radio");
 const reportMessage = document.getElementById("report-message");
@@ -132,6 +134,7 @@ if (params.has("id")) {
         .then(resp => resp.status == 200 ? resp.json() : null)
         .then(entries => {
             if (!entries || !entries.length) {return;}
+            entryDisplay.removeAttribute('hidden');
             console.log(`Loaded ${entries.length} entries`)
             generateCarouselItems(entries.length);
             entries.forEach((e, i) => {
@@ -193,6 +196,7 @@ function postReport() {
     .then(resp => resp.status == 200 ? resp.json() : null)
     .then(data => {
         reportModal.hide();
+        reportSuccessModal.show();
     })
 }
 

@@ -18,7 +18,7 @@ def create_box(key):
         pub_id=pub_id,
         key=key
     )
-    # box.save()
+    box.save()
     return box
 
 count = 0
