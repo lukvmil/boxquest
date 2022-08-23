@@ -13,14 +13,15 @@
 <body>
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand logo">boxquest</a>
+            <a href="/" class="navbar-brand logo">boxquest</a>
         </div>
     </nav>
     <div class="container p-3">
         <div class="d-grid">
+            <h1 class="mb-3">This tag hasn't been activated yet!</h1>
             <div class="mb-3">
-                <label for="quest-input" class="form-label">Set a quest for this thread</label>
-                <input type="text" class="form-control" id="quest-input">
+                <label for="quest-input" class="form-label">Set a quest for this tag</label>
+                <input type="text" class="form-control shadow-sm" id="quest-input">
                 <div class="form-text">A quest can be a goal for the thread to achieve, or just a discussion topic</div>
             </div>
             <!-- </div>
@@ -46,9 +47,19 @@
                 </div>
             </div> -->
             <div class="mb-3">
-                <label for="guide-input" class="form-label">Write instructions for the quest</label>
-                <textarea class="form-control border" id="guide-input" rows="4" style="resize: none;"></textarea>
-                <div class="form-text">Elaborate </div>
+                <label for="guide-input" class="form-label">Write a guide for the quest</label>
+                <textarea class="form-control border shadow-sm" id="guide-input" rows="4" style="resize: none;"></textarea>
+                <div class="form-text">A guide is instructions on how to carry out the quest, such as what to take a picture of or who to hand it off to</div>
+            </div>
+            <div class="mb-3">
+                <div class="form-label">Here are some examples for inspiration!</div>
+                <ul class="list-group shadow-sm">
+                    <li class="list-group-item">Send this tag around the world</li>
+                    <li class="list-group-item">Do a good deed and pass it on</li>
+                    <li class="list-group-item">Take a picture of your pet</li>
+                    <li class="list-group-item">Clean up trash at a local park</li>
+                    <li class="list-group-item">Try to get a selfie with a celebrity</li>
+                  </ul>
             </div>
             <div class="mb-3">
                 <div class="form-check form-switch">
@@ -60,7 +71,7 @@
                 <div class="form-text" id="validation-message" hidden>Make sure you complete all items!</div>
             </div>
 
-            <button class="btn btn-primary btn" id="submit-button" onclick="submitActivate()">Activate!<div
+            <button class="btn btn-primary btn shadow-sm" id="submit-button" onclick="submitActivate()">Activate!<div
                     class="spinner-border spinner-border-sm ms-2" role="status" id="loading-icon" hidden></div></button>
         </div>
     </div>

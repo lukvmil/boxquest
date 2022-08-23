@@ -8,6 +8,7 @@ const entryControls = document.getElementById("entryControls");
 const entryCarousel= new bootstrap.Carousel(entryControls);
 const entryCount = document.getElementById("entry-count");
 const questText = document.getElementById("quest-text");
+const introModal = new bootstrap.Modal(document.getElementById('intro-modal'))
 
 const loadProximity = 1;
 
@@ -99,13 +100,13 @@ if (params.has("k")) {
     fetch(`/api/get_id?key=${box_key}`)
         .then(resp => resp.json())
         .then(data => {
-            let knownBoxes = JSON.parse(localStorage.getItem("knownBoxes"));
+            let knownBoxes = new Set(JSON.parse(localStorage.getItem("knownBoxes")));
             if (knownBoxes) {
-                knownBoxes.push(data.id);
+                knownBoxes.add(data.id);
             } else {
                 knownBoxes = [data.id];
             }
-            localStorage.setItem("knownBoxes", JSON.stringify(knownBoxes));
+            localStorage.setItem("knownBoxes", JSON.stringify(Array.from(knownBoxes)));
             location.replace(`${location.pathname}?id=${data.id}`, '');
         })
 }
@@ -150,6 +151,10 @@ if (sessionStorage.getItem("box_key")) {
                 addEntryButton.removeAttribute("hidden");
             }
         });
+}
+
+if (!sessionStorage.getItem("returning_user")) {
+    introModal.show();
 }
 
 entryControls.addEventListener("slide.bs.carousel", event => {

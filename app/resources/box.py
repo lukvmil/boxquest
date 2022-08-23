@@ -10,6 +10,7 @@ class InteractBox(Resource):
 
         if box.active:
             return {
+                'id': box.id,
                 'active': box.active,
                 'public': box.public,
                 'quest': box.quest,
@@ -17,6 +18,7 @@ class InteractBox(Resource):
             }
         else:
             return {
+                'id': box.id,
                 'active': False
             }
     
@@ -29,6 +31,7 @@ class InteractBox(Resource):
         box = BoxModel.objects(pub_id=box_id).first()
         if not box: abort(404, message='Box not found.')
         if box.key != box_key: abort(403, message='Invalid key.')
+        if box.active: abort(409, message='Box has already been activated.')
 
         box.public = public
         box.quest = quest

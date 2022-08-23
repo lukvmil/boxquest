@@ -15,32 +15,34 @@
 <body>
     <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand logo">boxquest</a>
+            <a href="/" class="navbar-brand logo">boxquest</a>
         </div>
     </nav>
     <div class="container p-3">
         <div class="d-grid">
-            <div class="card border">
+            <div class="card border shadow-sm">
                 <div class="card-body">
                     <h6 class="card-subtitle text-muted mb-2">The quest for this thread is...</h6>
                     <h5 class="card-title" id="quest-text"></h5>
                 </div>
             </div>
 
-            <div class="card border mt-3" id="map-container">
-                <div id="map" class="map" style="height: 30vh; width: 100%;"></div>
+            <div class="card border shadow-sm mt-3" id="map-container">
+                <div class="card-img-bottom">
+                    <div id="map" class="map" style="height: 30vh; width: 100%;"></div>
+                </div>
             </div>
             <div class="form-text">Tap a marker above to view the entry for that location</div>
 
-            <button class="btn btn-success btn mt-3" id="add-entry" onclick="location.href='/box/add-entry'+location.search"
+            <button class="btn btn-success btn mt-3 shadow-sm" id="add-entry" onclick="location.href='/box/add-entry'+location.search"
                 hidden>Add an Entry</button>
 
             
 
-            <div class="card border mt-3">
+            <div class="card border shadow-sm my-3">
 
                 <div class="card-body">
-                    <div class="card-text d-flex">
+                    <div class="card-text d-flex mb-1">
                         <div><small class="text-muted" id="entry-count">#3/6</small></div>
                         <div class="ms-auto"><a href="#" class="link-secondary"><small>Report</small></a>
                         </div>
@@ -64,6 +66,29 @@
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
+                </div>
+            </div>
+            <button class="btn btn-secondary btn me-1 shadow-sm" style="width: 100%;" id="submit-button" onclick="location.href='/'">Go Back</button>
+
+        </div>
+    </div>
+    <div class="modal" id="intro-modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Welcome to BoxQuest!</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Make sure location services are enabled and allowed for your browser.
+                    <ul>
+                        <li>On iOS: Settings &gt; Privacy &gt; Location Services</li>
+                        <li>On Android: Settings &gt; Location &gt; App permissions</li>
+                    </ul>
+                    If you are still receiving this error, check your in browser settings to ensure location permissions are enabled for this site.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="sessionStorage.setItem('returning_user', true);">Get Started!</button>
                 </div>
             </div>
         </div>
