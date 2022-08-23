@@ -8,7 +8,12 @@ const entryControls = document.getElementById("entryControls");
 const entryCarousel= new bootstrap.Carousel(entryControls);
 const entryCount = document.getElementById("entry-count");
 const questText = document.getElementById("quest-text");
-const introModal = new bootstrap.Modal(document.getElementById('intro-modal'))
+const introModal = new bootstrap.Modal(document.getElementById('intro-modal'));
+const reportModal = new bootstrap.Modal(document.getElementById('report-modal'));
+const reportQuestRadio = document.getElementById("report-quest-radio");
+const reportEntryRadio = document.getElementById("report-entry-radio");
+const reportMessage = document.getElementById("report-message");
+const validationMessage = document.getElementById("validation-message");
 
 const loadProximity = 1;
 
@@ -153,7 +158,7 @@ if (sessionStorage.getItem("box_key")) {
         });
 }
 
-if (!sessionStorage.getItem("returning_user")) {
+if (!localStorage.getItem("returning_user")) {
     introModal.show();
 }
 
@@ -161,6 +166,52 @@ entryControls.addEventListener("slide.bs.carousel", event => {
     setActiveEntry(event.to, "carousel");
 })
 
+function validateItem(condition, element) {
+    if (condition) {
+        element.classList.remove("border-danger");
+        element.classList.add("border-success");
+        return true;
+    } else {
+        element.classList.remove("border-success");
+        element.classList.add("border-danger");
+        return false;
+    }
+}
+
+function postReport() {
+    let data = new FormData();
+    data.append('type', reportQuestRadio.checked ? 'quest' : 'entry');
+    data.append('reason', reportMessage.value);
+    data.append('entry_id', entryList[activeEntryId].id);
+
+    let box_id = params.get('id');
+
+    fetch(`/api/box/${box_id}/report`, {
+        method: 'POST',
+        body: data
+    })
+    .then(resp => resp.status == 200 ? resp.json() : null)
+    .then(data => {
+        reportModal.hide();
+    })
+}
+
+function submitReport() {
+    let messageValid = validateItem(reportMessage.value, reportMessage);
+
+    validationMessage.removeAttribute("hidden");
+
+    if (messageValid) {
+        validationMessage.classList.remove("text-danger");
+        validationMessage.classList.add("text-success");
+        validationMessage.innerText = "Looks good!";
+        postReport();
+    } else {
+        validationMessage.classList.remove("text-success");
+        validationMessage.classList.add("text-danger");
+        validationMessage.innerText = "Make sure you complete all items!";
+    }
+}
 
 let map = new ol.Map({
     target: 'map',

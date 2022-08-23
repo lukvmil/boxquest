@@ -1,6 +1,7 @@
 from flask import request
 from flask_restful import Resource, abort
 from datetime import datetime
+from time import mktime
 from io import BytesIO
 import json
 from app.common import utils
@@ -50,13 +51,14 @@ class ViewEntries(Resource):
 
         for e in box.entries:
             if not type(e) is EntryModel: continue
-            e = json.loads(e.to_json())
+            e_dict = json.loads(e.to_json())
             entries.append({
-                'timestamp': e['timestamp']['$date'],
-                'location': e['location'],
-                'location_str': e['location_str'],
-                'message': e['message'],
-                'image': e['image']['$oid']
+                'id': str(e.id),
+                'timestamp': e_dict['timestamp']['$date'],
+                'location': e.location,
+                'location_str': e.location_str,
+                'message': e.message,
+                'image': str(e.image.grid_id)
             })
         
         return entries

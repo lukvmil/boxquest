@@ -34,17 +34,18 @@
             </div>
             <div class="form-text">Tap a marker above to view the entry for that location</div>
 
-            <button class="btn btn-success btn mt-3 shadow-sm" id="add-entry" onclick="location.href='/box/add-entry'+location.search"
-                hidden>Add an Entry</button>
+            <button class="btn btn-success btn mt-3 shadow-sm" id="add-entry"
+                onclick="location.href='/box/add-entry'+location.search" hidden>Add an Entry</button>
 
-            
+
 
             <div class="card border shadow-sm my-3">
 
                 <div class="card-body">
-                    <div class="card-text d-flex mb-1">
-                        <div><small class="text-muted" id="entry-count">#3/6</small></div>
-                        <div class="ms-auto"><a href="#" class="link-secondary"><small>Report</small></a>
+                    <div class="card-text d-flex">
+                        <div><small class="text-muted" id="entry-count"></small></div>
+                        <div class="ms-auto"><button class="btn btn-sm btn-link link-secondary"
+                                onclick="reportModal.show();">Report</button>
                         </div>
                     </div>
                     <p class="card-text" id="entry-body"></p>
@@ -56,19 +57,23 @@
                 <img class="card-img-bottom" id="entry-img" hidden>
                 <div id="entryControls" class="carousel slide">
                     <div class="carousel-inner" id="entry-images">
-                        <div class="carousel-item active" id="initial-entry-image"><img class="d-block w-100 card-img-bottom"></div>
+                        <div class="carousel-item active" id="initial-entry-image"><img
+                                class="d-block w-100 card-img-bottom"></div>
                     </div>
-                    <button class="carousel-control-prev" type="button" data-bs-target="#entryControls" data-bs-slide="prev">
+                    <button class="carousel-control-prev" type="button" data-bs-target="#entryControls"
+                        data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Previous</span>
                     </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#entryControls" data-bs-slide="next">
+                    <button class="carousel-control-next" type="button" data-bs-target="#entryControls"
+                        data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Next</span>
                     </button>
                 </div>
             </div>
-            <button class="btn btn-secondary btn me-1 shadow-sm" style="width: 100%;" id="submit-button" onclick="location.href='/'">Go Back</button>
+            <button class="btn btn-secondary btn me-1 shadow-sm" style="width: 100%;" id="submit-button"
+                onclick="location.href='/'">Go Back</button>
 
         </div>
     </div>
@@ -85,10 +90,47 @@
                         <li>On iOS: Settings &gt; Privacy &gt; Location Services</li>
                         <li>On Android: Settings &gt; Location &gt; App permissions</li>
                     </ul>
-                    If you are still receiving this error, check your in browser settings to ensure location permissions are enabled for this site.
+                    If you are still receiving this error, check your in browser settings to ensure location permissions
+                    are enabled for this site.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="sessionStorage.setItem('returning_user', true);">Get Started!</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                        onclick="localStorage.setItem('returning_user', true);">Get Started!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="report-modal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Report this Quest or Entry</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="report-message" class="form-label">Reason for reporting</label>
+                        <textarea class="form-control border shadow-sm" id="report-message" rows="4" style="resize: none;" autocomplete="off"></textarea>
+                        <div class="form-text">A quest can be a goal for the thread to achieve, or just a discussion topic</div>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="report-entry-radio" autocomplete="off" checked>
+                        <label class="form-check-label" for="report-entry-radio">
+                            Entry
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="flexRadioDefault" id="report-quest-radio" autcomplete="off">
+                        <label class="form-check-label" for="report-quest-radio">
+                            Quest
+                        </label>
+                    </div>
+                    <div class="form-text" id="validation-message" hidden>Make sure you complete all items!</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Go Back</button>
+                    <button type="button" class="btn btn-danger" onclick="submitReport();">Submit Report</button>
                 </div>
             </div>
         </div>
@@ -99,4 +141,5 @@
     integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
     crossorigin="anonymous"></script>
 <script src="/js/box.js"></script>
+
 </html>

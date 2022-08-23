@@ -24,8 +24,6 @@ function postActivate() {
     data.append('guide', guideInput.value);
     data.append('box_key', sessionStorage.getItem('box_key'));
 
-    console.log(data);
-
     let box_id = params.get('id');
 
     fetch(`/api/box/${box_id}`, {

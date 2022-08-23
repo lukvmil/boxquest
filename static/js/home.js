@@ -29,12 +29,12 @@ if (knownBoxes) {
             .then(resp => resp.status == 200 ? resp.json() : null)
             .then(box => {
                 console.log(box);
-                if (box.active) {
+                if (box && box.active) {
                     savedQuestList.appendChild(createQuestItem(box));
+                    savedQuests.removeAttribute('hidden');
                 }
             });
     })
-    savedQuests.removeAttribute('hidden');
 }
 
 fetch('/api/box/public')
