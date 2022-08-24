@@ -65,7 +65,8 @@ def show_box(_id):
         print("Entries:", len(box.entries))
         print()
         print("[1] View entries")
-        print("[2] Delete")
+        print("[2] Reset")
+        print("[3] Delete")
         print()
         sel = input("> ")
 
@@ -77,6 +78,18 @@ def show_box(_id):
             sel = input("> ")
             if not sel: continue
             show_entry(box, box.entries[int(sel)-1].id)
+        elif sel == "2":
+            print(f"Confirm reset box {box.id}?")
+            sel = input("> ")
+            if sel == "y":
+                box.public = None
+                box.quest = None
+                box.guide = None
+                box.active = False
+                for e in box.entries:
+                    e.delete()
+                box.save()
+                print("Deleted")
         else: break
     return True
 
