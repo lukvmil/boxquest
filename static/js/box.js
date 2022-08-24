@@ -15,7 +15,11 @@ const reportSuccessModal = new bootstrap.Modal(document.getElementById('report-s
 const reportQuestRadio = document.getElementById("report-quest-radio");
 const reportEntryRadio = document.getElementById("report-entry-radio");
 const reportMessage = document.getElementById("report-message");
-const validationMessage = document.getElementById("validation-message");
+const reportValidationMessage = document.getElementById("report-validation-message");
+const emailModal = new bootstrap.Modal(document.getElementById("email-modal"));
+const emailInput = document.getElementById("email-input");
+const emailValidationMessage = document.getElementById("email-validation-message");
+const emailSuccessModal = new bootstrap.Modal(document.getElementById('email-success-modal'));
 
 const loadProximity = 1;
 
@@ -165,6 +169,10 @@ if (!localStorage.getItem("returning_user")) {
     introModal.show();
 }
 
+if (!localStorage.getItem("asked_email") && params.get("redirect")) {
+    emailModal.show();
+}
+
 entryControls.addEventListener("slide.bs.carousel", event => {
     setActiveEntry(event.to, "carousel");
 })
@@ -203,18 +211,66 @@ function postReport() {
 function submitReport() {
     let messageValid = validateItem(reportMessage.value, reportMessage);
 
-    validationMessage.removeAttribute("hidden");
+    reportValidationMessage.removeAttribute("hidden");
 
     if (messageValid) {
-        validationMessage.classList.remove("text-danger");
-        validationMessage.classList.add("text-success");
-        validationMessage.innerText = "Looks good!";
+        reportValidationMessage.classList.remove("text-danger");
+        reportValidationMessage.classList.add("text-success");
+        reportValidationMessage.innerText = "Looks good!";
         postReport();
     } else {
-        validationMessage.classList.remove("text-success");
-        validationMessage.classList.add("text-danger");
-        validationMessage.innerText = "Make sure you complete all items!";
+        reportValidationMessage.classList.remove("text-success");
+        reportValidationMessage.classList.add("text-danger");
+        reportValidationMessage.innerText = "Make sure you complete all items!";
     }
+}
+
+function postEmail() {
+    let data = new FormData();
+    data.append('email', emailInput.value);
+
+    let box_id = params.get('id');
+
+    fetch(`/api/email`, {
+        method: 'POST',
+        body: data
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        if (data.success) {
+            emailModal.hide();
+            emailSuccessModal.show();
+        } else {
+
+        }
+    })
+}
+
+function submitEmail() {
+    let data = new FormData();
+    data.append('email', emailInput.value);
+
+    let box_id = params.get('id');
+
+    fetch(`/api/email`, {
+        method: 'POST',
+        body: data
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        emailValidationMessage.removeAttribute("hidden");
+        if (data.success) {
+            emailValidationMessage.classList.remove("text-danger");
+            emailValidationMessage.classList.add("text-success");
+            emailValidationMessage.innerText = "Looks good!";
+            emailModal.hide();
+            emailSuccessModal.show();
+        } else {
+            emailValidationMessage.classList.remove("text-success");
+            emailValidationMessage.classList.add("text-danger");
+            emailValidationMessage.innerText = "Please enter a valid email address";
+        }
+    });
 }
 
 let map = new ol.Map({
@@ -226,8 +282,7 @@ let map = new ol.Map({
     ],
     view: new ol.View({
         center: ol.proj.fromLonLat([-95, 37]),
-        zoom: 3,
-        maxZoom: 16
+        zoom: 3
     })
 
 });

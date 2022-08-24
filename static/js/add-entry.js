@@ -111,7 +111,7 @@ function postEntry() {
         .then(data => {
             console.log(data);
             sessionStorage.removeItem("box_key");
-            location.href = `/box?id=${box_id}`;
+            location.href = `/box?id=${box_id}&redirect=true`;
         })
 }
 
