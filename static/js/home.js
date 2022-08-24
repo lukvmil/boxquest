@@ -24,11 +24,9 @@ fetch('/api/stats')
 let knownBoxes = JSON.parse(localStorage.getItem("knownBoxes"));
 if (knownBoxes) {
     knownBoxes.forEach(box_id => {
-        console.log(box_id);
         fetch(`/api/box/${box_id}`)
             .then(resp => resp.status == 200 ? resp.json() : null)
             .then(box => {
-                console.log(box);
                 if (box && box.active) {
                     savedQuestList.appendChild(createQuestItem(box));
                     savedQuests.removeAttribute('hidden');
@@ -45,7 +43,6 @@ fetch('/api/box/public')
                 fetch(`/api/box/${box_id}`)
                     .then(resp => resp.status == 200 ? resp.json() : null)
                     .then(box => {
-                        console.log(box);
                         if (box.active) {
                             publicQuestList.appendChild(createQuestItem(box));
                         }
@@ -53,3 +50,5 @@ fetch('/api/box/public')
             })
         }
     })
+
+sessionStorage.removeItem("box_key");

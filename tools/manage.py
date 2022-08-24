@@ -87,7 +87,9 @@ def show_box(_id):
                 box.guide = None
                 box.active = False
                 for e in box.entries:
+                    if not type(e) is EntryModel: continue
                     e.delete()
+                box.entries = []
                 box.save()
                 print("Deleted")
         else: break
