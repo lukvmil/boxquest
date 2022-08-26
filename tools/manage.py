@@ -71,7 +71,7 @@ def show_box(_id):
         sel = input("> ")
 
         if sel == "1":
-            print(f"[Entries for box {box.id}]")
+            print(f"[Entries for box {box.id}: {box.quest}]")
             for i, e in enumerate(box.entries):
                 print(f"[{i+1}] {e.id}")
             print()
@@ -103,7 +103,7 @@ while True:
         active_boxes = BoxModel.objects(active=True)
         print("[Active boxes]")
         for i, a in enumerate(active_boxes):
-            print(f"[{i+1}] {a.id}")
+            print(f"[{i+1}] {a.id} {a.quest}")
         print()
         sel = input("> ")
         if not sel: continue

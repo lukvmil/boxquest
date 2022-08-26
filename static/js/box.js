@@ -170,6 +170,7 @@ if (!localStorage.getItem("returning_user")) {
 }
 
 if (!localStorage.getItem("asked_email") && params.get("redirect")) {
+    localStorage.setItem("asked_email", true);
     emailModal.show();
 }
 
