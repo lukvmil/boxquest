@@ -1,6 +1,7 @@
 from flask import request
 from flask_restful import Resource, abort
 import json
+from datetime import datetime
 from app.models import BoxModel, EntryModel, EmailModel
 from mongoengine.errors import ValidationError
 
@@ -15,17 +16,8 @@ class ViewInfo(Resource):
         }
 
 class PublicBoxes(Resource):
-    def get(self):
-        public_boxes = list(BoxModel.objects(active=True, public=True))
-        public_boxes.sort(key=lambda b: len(b.entries), reverse=True)
-        return [{
-            'id': box.id,
-            'active': box.active,
-            'public': box.public,
-            'quest': box.quest,
-            'guide': box.guide,
-            'entry_count': len(box.entries)
-        } for box in public_boxes]
+    # top 5 python one liner below
+    def get(self): return [{'id': box.id, 'active': box.active, 'public': box.public, 'quest': box.quest, 'guide': box.guide, 'entry_count': len(box.entries)} for box in sorted(list(BoxModel.objects(active=True, public=True)), key=lambda b: b.entries[-1].timestamp if b.entries else datetime.min, reverse=True)]
 
 
 class SubmitEmail(Resource):
