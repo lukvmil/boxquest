@@ -16,8 +16,16 @@ class ViewInfo(Resource):
 
 class PublicBoxes(Resource):
     def get(self):
-        public_boxes = BoxModel.objects(active=True, public=True)
-        return [box.id for box in public_boxes]
+        public_boxes = list(BoxModel.objects(active=True, public=True))
+        public_boxes.sort(key=lambda b: len(b.entries), reverse=True)
+        return [{
+            'id': box.id,
+            'active': box.active,
+            'public': box.public,
+            'quest': box.quest,
+            'guide': box.guide,
+            'entry_count': len(box.entries)
+        } for box in public_boxes]
 
 
 class SubmitEmail(Resource):

@@ -8,7 +8,8 @@ const questItemTemplate = document.getElementById("quest-item-template");
 function createQuestItem(box) {
     let questItem = questItemTemplate.cloneNode(true);
     questItem.children[0].innerText = box.quest;
-    questItem.children[1].innerText = box.id;
+    questItem.children[1].innerText = `${box.entry_count}`;
+    questItem.children[2].innerText = box.id;
     questItem.href = `/box?id=${box.id}`
     questItem.classList.remove('visually-hidden');
     return questItem;
@@ -39,14 +40,10 @@ fetch('/api/box/public')
     .then(resp => resp.json())
     .then(publicBoxes => {
         if (publicBoxes.length) {
-            publicBoxes.forEach(box_id => {
-                fetch(`/api/box/${box_id}`)
-                    .then(resp => resp.status == 200 ? resp.json() : null)
-                    .then(box => {
-                        if (box.active) {
-                            publicQuestList.appendChild(createQuestItem(box));
-                        }
-                    });
+            publicBoxes.forEach(box => {
+                if (box.active) {
+                    publicQuestList.appendChild(createQuestItem(box));
+                }
             })
         }
     })

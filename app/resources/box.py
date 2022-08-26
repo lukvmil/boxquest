@@ -14,7 +14,8 @@ class InteractBox(Resource):
                 'active': box.active,
                 'public': box.public,
                 'quest': box.quest,
-                'guide': box.guide
+                'guide': box.guide,
+                'entry_count': len(box.entries)
             }
         else:
             return {
