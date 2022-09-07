@@ -9,6 +9,7 @@ const entryControls = document.getElementById("entryControls");
 const entryCarousel= new bootstrap.Carousel(entryControls);
 const entryCount = document.getElementById("entry-count");
 const questText = document.getElementById("quest-text");
+const guideText = document.getElementById("guide-text");
 const introModal = new bootstrap.Modal(document.getElementById('intro-modal'));
 const reportModal = new bootstrap.Modal(document.getElementById('report-modal'));
 const reportSuccessModal = new bootstrap.Modal(document.getElementById('report-success-modal'));
@@ -132,6 +133,7 @@ if (params.has("id")) {
             }
             boxData = box;
             questText.innerText = box.quest;
+            guideText.innerText = box.guide;
         });
 
     fetch(`/api/box/${box_id}/entries`)
@@ -179,7 +181,8 @@ entryControls.addEventListener("slide.bs.carousel", event => {
 })
 
 function validateItem(condition, element) {
-    if (condition) {
+    if (condition) {const guideText = document.getElementById("guide-text");
+
         element.classList.remove("border-danger");
         element.classList.add("border-success");
         return true;
